@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar Servicio - OrquideaSuite</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo" class="logo">
+            <h1>Solicitar Servicio de Lavandería</h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+        {% if habitaciones %}
+            <form method="POST" class="form-container">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="habitacion">Selecciona una habitación:</label>
+                    <select name="habitacion" id="habitacion" class="form-control" required>
+                        {% for habitacion in habitaciones %}
+                            <option value="{{ habitacion.id }}">
+                                Habitacion {{ habitacion.numero }} - {{ habitacion.tipo }} 
+                                {% if habitacion.estado == 'ocupada' %}
+                                    (Ocupada)
+                                {% else %}
+                                    (Disponible)
+                                {% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción del Servicio:</label>
+                    <textarea name="descripcion" id="descripcion" class="form-control" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="precio_servicio">Precio del Servicio:</label>
+                    <input type="number" name="precio_servicio" id="precio_servicio" step="0.01" class="form-control" required />
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Solicitar Servicio</button>
+                    <a href="{% url 'dashboard' %}" class="btn-secondary">Regresar al Dashboard</a>
+                </div>
+            </form>
+        {% else %}
+            <p class="info-message">
+                No tienes habitaciones registradas. <a href="{% url 'crear_habitacion' %}" class="link">Crea una habitación</a> para solicitar un servicio.
+            </p>
+        {% endif %}
+    </main>
+</body>
+</html>

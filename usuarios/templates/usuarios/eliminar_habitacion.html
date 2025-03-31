@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Habitaciones - OrquideaSuite</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+        <h1>OrquideaSuite - Eliminar Habitaciones</h1>
+    </header>
+    
+    {% include 'usuarios/messages.html' %}
+
+    <h1>Eliminar Habitación</h1>
+    <p>¿Estás seguro de que deseas eliminar la habitación {{ habitacion.numero }}?</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Sí, eliminar</button>
+    </form>
+    <a href="{% url 'visualizar_habitaciones' %}">Cancelar</a>
+</body>
+</html>

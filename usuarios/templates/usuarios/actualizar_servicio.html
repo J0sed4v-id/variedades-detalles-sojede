@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Servicio - OrquideaSuite</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+        <h1>OrquideaSuite - Actualizar Estado del Servicio</h1>
+    </header>
+
+    <div class="container">
+        <h2>Actualizar Estado del Servicio de Lavandería</h2>
+        <form>
+            <label for="service-status">Nuevo Estado del Servicio:</label>
+            <select id="service-status" required>
+                <option value="pendiente">Pendiente</option>
+                <option value="en-proceso">En Proceso</option>
+                <option value="completado">Completado</option>
+            </select>
+
+            <button type="submit" class="btn">Actualizar Estado</button>
+        </form>
+    </div>
+</body>
+</html>

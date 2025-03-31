@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Servicios de Lavandería</title>
+</head>
+<body>
+    <h1>Servicios de Lavandería</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Fecha Solicitud</th>
+                <th>Estado</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+            <tr>
+                <td>{{ servicio.id }}</td>
+                <td>{{ servicio.usuario.nombre }}</td>
+                <td>{{ servicio.fecha_solicitud|date:"d M Y H:i" }}</td>
+                <td>{{ servicio.estado }}</td>
+                <td>{{ servicio.descripcion }}</td>
+                <td>{{ servicio.precio_servicio|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No hay servicios registrados</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+    <!-- Botón para regresar al login -->
+    <a href="{% url 'dashboard' %}">
+        <button>Regresar al Login</button>
+    </a>
+</body>
+</html>

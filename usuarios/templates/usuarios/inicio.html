@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrquideaSuite - Inicio de Sesión</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <header>
+        <img src="{% static 'orchid-logo.png' %}" alt="OrquideaSuite Logo" class="invisible-logo">
+        <h1>Bienvenido a OrquideaSuite</h1>
+    </header>
+
+    <!-- Bloque para mostrar mensajes de éxito o error -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="login-container">
+        <div class="login-box">
+            <h2>Iniciar Sesión</h2>
+            <form action="{% url 'iniciar_sesion' %}" method="post">
+                {% csrf_token %}
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required>
+                
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit" class="btn">Ingresar</button>
+            </form>
+            <p><a href="{% url 'registrar' %}">Registrar nueva cuenta</a></p>
+        </div>
+    </div>
+</body>
+</html>

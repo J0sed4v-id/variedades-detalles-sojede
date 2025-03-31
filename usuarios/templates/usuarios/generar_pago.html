@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Pago - OrquideaSuite</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+        <h1>OrquideaSuite - Generar Pago</h1>
+    </header>
+
+    <div class="container">
+        <h2>Seleccionar Método de Pago</h2>
+        <form>
+            <label for="payment-method">Método de Pago:</label>
+            <select id="payment-method" required>
+                <option value="tarjeta">Tarjeta de Crédito</option>
+                <option value="paypal">PayPal</option>
+                <option value="transferencia">Transferencia Bancaria</option>
+            </select>
+
+            <button type="submit" class="btn">Realizar Pago</button>
+        </form>
+    </div>
+</body>
+</html>

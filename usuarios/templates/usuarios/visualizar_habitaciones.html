@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Habitaciones - OrquideaSuite</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo" class="logo">
+            <h1>Lista de Habitaciones</h1>
+        </div>
+    </header>
+
+    {% include 'usuarios/messages.html' %}
+
+    <main class="main-content">
+        <section class="table-container">
+            <table class="material-table">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Tipo</th>
+                        <th>Capacidad</th>
+                        <th>Precio por noche</th>
+                        <th>Disponibilidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for habitacion in habitaciones %}
+                        <tr>
+                            <td>{{ habitacion.numero }}</td>
+                            <td>{{ habitacion.tipo }}</td>
+                            <td>{{ habitacion.capacidad }}</td>
+                            <td>${{ habitacion.precio_por_noche }}</td>
+                            <td class="{% if habitacion.disponible %}disponible{% else %}no-disponible{% endif %}">
+                                {{ habitacion.disponible|yesno:"Sí,No" }}
+                            </td>
+                            <td>
+                                <a href="{% url 'actualizar_habitacion' habitacion.id %}" class="btn-edit">Editar</a>
+                                
+                                <!-- Formulario de eliminación dentro de la misma tabla -->
+                                <form action="{% url 'eliminar_habitacion' habitacion.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-delete">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <div class="button-group">
+            <a href="{% url 'crear_habitacion' %}" class="btn-primary">Crear Nueva Habitación</a>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+        </div>
+    </main>
+</body>
+</html>

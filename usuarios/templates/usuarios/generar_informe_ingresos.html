@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrquideaSuite - Generar Informe de servicios adicionales</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+        <h1>Generar Informe de servicios adicionales</h1>
+        <button class="btn-logout" onclick="window.location.href='../dashboard.html'">Volver al Dashboard</button>
+    </header>
+
+    <div class="form-container">
+        <h2>Selecciona el período para generar el informe</h2>
+        <form action="#">
+            <label for="start-date">Fecha de inicio:</label>
+            <input type="date" id="start-date" name="start-date" required>
+
+            <label for="end-date">Fecha de fin:</label>
+            <input type="date" id="end-date" name="end-date" required>
+
+            <button type="submit" class="btn-action">Generar Informe</button>
+        </form>
+    </div>
+</body>
+</html>

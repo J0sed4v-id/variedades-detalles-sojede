@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Habitaciones - OrquideaSuite</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+    <!-- <header>
+        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+        <h1>OrquideaSuite - Buscar Habitaciones</h1>
+    </header>-->
+
+    <header class="top-bar">
+        <div class="logo">
+            <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+        </div>
+        <h1>OrquideaSuite - Buscar Habitaciones</h1>
+    </header>
+
+    <!-- Incluye aquí el archivo de mensajes -->
+    {% include 'usuarios/messages.html' %}
+
+    <a href="{% url 'dashboard' %}" class="btn-menu">Volver al Menú</a>
+
+    <div class="container">
+        <h2>Buscar Habitaciones Disponibles</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Buscar</button>
+        </form>
+
+        {% if habitaciones_disponibles %}
+            <h3>Habitaciones Disponibles</h3>
+            <ul>
+                {% for habitacion in habitaciones_disponibles %}
+                    <li>{{ habitacion.tipo }} - {{ habitacion.numero }} - Capacidad: {{ habitacion.capacidad }} - Precio por noche: {{ habitacion.precio_por_noche }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {% if form.is_bound %}
+                <p>No se encontraron habitaciones disponibles para los criterios seleccionados.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
+
+

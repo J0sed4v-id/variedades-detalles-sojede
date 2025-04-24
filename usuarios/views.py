@@ -238,12 +238,43 @@ def modificar_reserva(request, id):
     
     return render(request, 'usuarios/modificar_reserva.html', {'form': form})
 
+
+
 # Vista para cancelar una reserva
 @login_required(login_url='iniciar_sesion')
 def cancelar_reserva(request):
-    # Aquí se agregarán las funcionalidades para cancelar una reserva
-    messages.info(request, "Funcionalidad para cancelar una reserva aún no implementada.")
-    return render(request, 'usuarios/cancelar_reserva.html')
+    # Solo obtener las reservas con estado 'reservada' y asociadas a una habitación no disponible.
+    if request.method == 'POST':
+        habitacion_id = request.POST.get('habitacion_id')
+        
+        try:
+            # Filtrar las reservas con estado 'reservada' y asociadas a la habitación que se seleccionó
+            reservas = Reserva.objects.filter(habitacion_id=habitacion_id, estado_reserva='reservada')
+
+            if reservas.count() == 1:
+                reserva = reservas.first()
+
+                # Cancelar la reserva
+                reserva.estado_reserva = 'cancelada'
+                reserva.habitacion.disponible = True  # Hacer disponible la habitación
+                reserva.habitacion.save()
+                reserva.save()
+
+                # Notificar al usuario
+                messages.success(request, f'¡Reserva para la habitación {reserva.habitacion.numero} cancelada con éxito!')
+            else:
+                messages.error(request, 'No se encontró una reserva válida para cancelar.')
+
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error: {str(e)}')
+
+        return redirect('dashboard')
+
+    # Si no es un POST, filtrar las habitaciones reservadas para mostrarlas en el formulario
+    habitaciones_reservadas = Habitacion.objects.filter(disponible=False)
+    
+    return render(request, 'usuarios/cancelar_reserva.html', {'habitaciones_reservadas': habitaciones_reservadas})
+
 
 # Vista para generar una factura
 @login_required(login_url='iniciar_sesion')

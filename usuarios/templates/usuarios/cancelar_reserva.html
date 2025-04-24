@@ -14,12 +14,26 @@
 
     <div class="container">
         <h2>Cancela tu Reserva</h2>
-        <form>
-            <label for="reservation-id">Número de Reserva:</label>
-            <input type="text" id="reservation-id" placeholder="Ingresa tu número de reserva" required>
 
+        <!-- Mensajes de éxito o error -->
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <!-- Formulario de cancelación -->
+        <form method="POST">
+            {% csrf_token %}
+            <label for="habitacion_id">Selecciona una habitación reservada:</label>
+            <select name="habitacion_id" id="habitacion_id" required>
+                {% for habitacion in habitaciones_reservadas %}
+                    <option value="{{ habitacion.id }}">Habitación {{ habitacion.numero }}</option>
+                {% empty %}
+                    <option disabled>No hay habitaciones reservadas</option>
+                {% endfor %}
+            </select>
             <button type="submit" class="btn">Cancelar Reserva</button>
         </form>
-    </div>
-</body>
-</html>

@@ -15,8 +15,8 @@
         </div>
     </header>
 
+    <h2>Reserva tu Habitación</h2>
     <div class="form-container">
-        <h2>Reserva tu Habitación</h2>
         <form method="POST">
             {% csrf_token %}
             
@@ -48,6 +48,11 @@
                 <input type="date" name="fecha_check_out" id="fecha_check_out" required>
             </div>
 
+            <!-- Botón para redirigir al dashboard -->
+            <div class="redirect-button">
+                <a href="{% url 'dashboard' %}" class="btn-secondary">Ir al Dashboard</a>
+             </div>
+
             <button type="submit" class="btn-primary">Reservar</button>
         </form>
 
@@ -61,10 +66,7 @@
             </div>
         {% endif %}
         
-        <!-- Botón para redirigir al dashboard -->
-        <div class="redirect-button">
-            <a href="{% url 'dashboard' %}" class="btn-secondary">Ir al Dashboard</a>
-        </div>
+        
     </div>
 </body>
 </html>

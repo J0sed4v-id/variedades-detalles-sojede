@@ -13,6 +13,7 @@ from .models import Habitacion, ServicioLavanderia, Reserva, Cliente
 from .forms import ReservaForm
 from django.db import IntegrityError
 from .forms import ReservaForm
+
 # Vista para el dashboard (requiere que el usuario esté autenticado)
 @login_required(login_url='iniciar_sesion')
 def dashboard(request):

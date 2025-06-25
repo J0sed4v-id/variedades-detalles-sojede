@@ -1,14 +1,15 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modificar Habitaciones - OrquideaSuite</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 </head>
 <body>
     <header>
-        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+        <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" style="width:120px;height:auto;display:block;">
         <h1>OrquideaSuite - Modificar Habitaciones</h1>
     </header>
 
@@ -21,7 +22,9 @@
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Actualizar</button>
+        <div style="display: flex; justify-content: center;">
+            <button type="submit">Actualizar</button>
+        </div>
     </form>
     <a href="{% url 'visualizar_habitaciones' %}">Volver a la lista de habitaciones</a>
 </body>

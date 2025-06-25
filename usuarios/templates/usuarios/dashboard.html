@@ -12,7 +12,7 @@
     <!-- Barra superior -->
     <header class="top-bar">
         <div class="logo">
-            <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo">
+            <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" style="width:120px;height:auto;display:block;">
             <h1>Panel de Control</h1>
         </div>
         <div class="user-info">
@@ -48,16 +48,10 @@
                 <p>Revisa todas las habitaciones del hotel y sus características.</p>
             </div>
 
-            <div class="card" onclick="window.location.href='{% url 'reservar_habitacion' %}'">
-                <div class="card-icon">📅</div>
-                <h3>Reservar Habitación</h3>
-                <p>Selecciona y reserva una habitación.</p>
-            </div>
-
-            <div class="card" onclick="window.location.href='{% url 'solicitar_servicio' %}'">
-                <div class="card-icon">🛎️</div>
-                <h3>Solicitar Servicio</h3>
-                <p>Solicita servicios adicionales, como lavandería.</p>
+            <div class="card" onclick="window.location.href='{% url 'gestionar_reservas' %}'">
+                <div class="card-icon">📝</div>
+                <h3>Gestionar Reservas</h3>
+                <p>Crea, modifica y/o elimina tus reservas..</p>
             </div>
 
             <div class="card" onclick="window.location.href='{% url 'visualizar_facturas' %}'">
@@ -66,34 +60,10 @@
                 <p>Consulta las facturas de tus reservas y servicios.</p>
             </div>
 
-            <div class="card" onclick="window.location.href='{% url 'modificar_reserva' %}'">
-                <div class="card-icon">✏️</div>
-                <h3>Modificar Reserva</h3>
-                <p>Cambia los detalles de tu reserva.</p>
-            </div>
-
-            <div class="card" onclick="window.location.href='{% url 'cancelar_reserva' %}'">
-                <div class="card-icon">❌</div>
-                <h3>Cancelar Reserva</h3>
-                <p>Cancela tu reserva fácilmente.</p>
-            </div>
-
             <div class="card" onclick="window.location.href='{% url 'generar_factura' %}'">
                 <div class="card-icon">💼</div>
                 <h3>Generar Factura</h3>
                 <p>Genera facturas detalladas de tus reservas y servicios.</p>
-            </div>
-
-            <div class="card" onclick="window.location.href='{% url 'generar_pago' %}'">
-                <div class="card-icon">💳</div>
-                <h3>Generar Pago</h3>
-                <p>Elige tu método de pago preferido.</p>
-            </div>
-
-            <div class="card" onclick="window.location.href='{% url 'notificar_servicio' %}'">
-                <div class="card-icon">🔄</div>
-                <h3>Notificar Servicio</h3>
-                <p>Notifica el estado de los servicios solicitados.</p>
             </div>
 
             <div class="card" onclick="window.location.href='{% url 'generar_informe_ingresos' %}'">
@@ -101,6 +71,7 @@
                 <h3>Generar Informes</h3>
                 <p>Genera informes detallados.</p>
             </div>
+            
         </div>
     </div>
 </body>

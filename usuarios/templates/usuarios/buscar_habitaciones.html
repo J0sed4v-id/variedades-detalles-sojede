@@ -1,28 +1,29 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscar Habitaciones - OrquideaSuite</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 </head>
 <body>
     <!-- <header>
-        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+        <img src="/static/Orchid-logo.jpg" alt="OrquideaSuite Logo">
         <h1>OrquideaSuite - Buscar Habitaciones</h1>
     </header>-->
 
-    <header class="top-bar">
-        <div class="logo">
-            <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
+    <header class="custom-header">
+        <div class="custom-header-content">
+            <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" class="logo-img">
+            <h1 class="header-title">Buscar Habitaciones</h1>
         </div>
-        <h1>OrquideaSuite - Buscar Habitaciones</h1>
     </header>
 
     <!-- Incluye aquí el archivo de mensajes -->
     {% include 'usuarios/messages.html' %}
 
-    <a href="{% url 'dashboard' %}" class="btn-menu">Volver al Menú</a>
+
 
     <div class="container">
         <h2>Buscar Habitaciones Disponibles</h2>
@@ -44,6 +45,8 @@
                 <p>No se encontraron habitaciones disponibles para los criterios seleccionados.</p>
             {% endif %}
         {% endif %}
+
+        <a href="{% url 'dashboard' %}" class="btn-dashboard">Volver al Menú</a>
     </div>
 </body>
 </html>

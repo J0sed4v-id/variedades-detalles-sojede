@@ -14,14 +14,9 @@ urlpatterns = [
     path('habitaciones/crear/', views.crear_habitacion, name='crear_habitacion'),  # Crear habitación
     path('habitaciones/<int:id>/editar/', views.actualizar_habitacion, name='actualizar_habitacion'),
     path('habitaciones/<int:id>/eliminar/', views.eliminar_habitacion, name='eliminar_habitacion'),
-     path('reservar-habitacion/', views.reservar_habitacion, name='reservar_habitacion'),
-    path('solicitar_servicio/', views.solicitar_servicio, name='solicitar_servicio'),
     path('visualizar-facturas/', views.visualizar_facturas, name='visualizar_facturas'),
-    path('modificar-reserva/', views.modificar_reserva, name='modificar_reserva'),
-    path('cancelar-reserva/', views.cancelar_reserva, name='cancelar_reserva'),
     path('generar-factura/', views.generar_factura, name='generar_factura'),
-    path('generar-pago/', views.generar_pago, name='generar_pago'),
-    path('notificar-servicio/', views.notificar_servicio, name='notificar_servicio'),
     path('generar-informe-ingresos/', views.generar_informe_ingresos, name='generar_informe_ingresos'),
-    path('solicitar-servicio/', views.solicitar_servicio, name='solicitar_servicio'),
+    path('gestion_reservas/', views.gestionar_reservas, name='gestionar_reservas'),
+    path('pagar-factura/<int:factura_id>/', views.pagar_factura, name='pagar_factura'),
 ]

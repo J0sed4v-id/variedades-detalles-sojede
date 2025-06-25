@@ -3,9 +3,19 @@ body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #ffffff; /* Fondo blanco */
+    background-color: #ffffff;
     color: #333;
     text-align: center;
+}
+
+.title {
+    font-size: 2.5rem;
+    color: #ffffff;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    margin-right: 550px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Header */
@@ -13,21 +23,26 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #6a1b9a; /* Color primario del encabezado */
-    padding: 15px;
-    color: white;
+    background-color: #6a1b9a;
+    padding: 0.5rem;
+    height: 150px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 header img {
-    width: 50px; /* Ajuste de tamaño */
+    width: 50px;
     height: auto;
     margin-right: 10px;
+    border-radius: 50%;
+    object-fit: cover;
+    aspect-ratio: 1/1;
 }
 
 header h1 {
     font-size: 2rem;
-    color: white; /* Color blanco para el texto del encabezado */
+    color: white;
     margin: 0;
+    position: center;
 }
 
 /* Container for content */
@@ -35,7 +50,7 @@ header h1 {
     max-width: 1200px;
     margin: 40px auto;
     padding: 20px;
-    background-color: #ffffff; /* Fondo blanco */
+    background-color: #ffffff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
@@ -86,7 +101,7 @@ button:hover {
     padding: 20px;
     text-align: center;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Estilo más suave y de Material Design */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 }
@@ -198,13 +213,13 @@ button:hover {
 
 .card {
     background-color: #ffffff;
-    border: none; /* Sin borde */
-    border-radius: 12px; /* Borde más redondeado al estilo Material Design */
+    border: none;
+    border-radius: 12px;
     padding: 20px;
     width: 220px;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra ligera de Material Design */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     color: #5E35B1;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -216,7 +231,7 @@ button:hover {
 
 .card-icon {
     font-size: 36px;
-    color: #6a1b9a; /* Color destacado para los íconos */
+    color: #6a1b9a;
     margin-bottom: 10px;
 }
 
@@ -233,33 +248,30 @@ button:hover {
 /* Top bar */
 .top-bar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    gap: 20px;
     background-color: #6a1b9a;
+    padding: 10px;
     border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .logo img {
     width: 50px;
-    margin-right: 10px;
+    height: auto;
+    margin-right: 0;
 }
 
-.btn-menu {
-    display: inline-block;
-    padding: 1% 15px;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 5px;
-    text-decoration: none;
-    background-color: #8e24aa;
+.top-bar h1 {
     color: white;
-    transition: background-color 0.3s;
-    margin-top: 15px;
-}
-
-.btn-menu:hover {
-    background-color: #6a1b9a;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: normal;
 }
 
 /* Botón para redirigir al dashboard */
@@ -278,12 +290,31 @@ button:hover {
 
 .btn-dashboard:hover {
     background-color: #8e24aa;
-    transform: translateY(-3px); /* Efecto de elevación */
+    transform: translateY(-3px);
 }
 
 .btn-dashboard:active {
-    transform: translateY(0); /* Sin elevación cuando se hace clic */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Sombra más suave */
+    transform: translateY(0);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background-color: #6a1b9a;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 1rem;
+    text-decoration: none;
+    border: none;
+    display: inline-block;
+    margin-right: 10px;
+    transition: background-color 0.3s, transform 0.3s;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #8e24aa;
+    transform: translateY(-2px);
 }
 
 /* Responsividad */
@@ -306,7 +337,7 @@ button:hover {
     }
 
     .btn-dashboard {
-        width: 100%; /* Ocupa todo el ancho en pantallas pequeñas */
+        width: 100%;
     }
 }
 
@@ -316,6 +347,7 @@ button:hover {
     padding: 15px;
     border-radius: 5px;
     text-align: center;
+    color: #8e24aa;
 }
 
 .alert.success {
@@ -325,22 +357,262 @@ button:hover {
 
 .alert.error {
     background-color: #f44336;
-    color: white;
 }
 
-.redirect-button {
-    margin-top: 30px;
-    text-align: center;
+/* Redirección */
+.btn-secondary:hover {
+    background-color: #6a1b9a;
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    color: white;
+    background-color: #8e24aa;
 }
 
 .btn-secondary {
-    background-color: #8e24aa;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.redirect-button {
     color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
+}
+
+/* -------------------------------------------
+   Estilos específicos para visualizar_facturas
+------------------------------------------- */
+.facturas-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.facturas-container h2 {
+    font-size: 2rem;
+    color: #6a1b9a;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.facturas-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.factura-item {
+    background-color: white;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-left: 5px solid #6a1b9a;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    font-size: 1rem;
+    line-height: 1.6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.factura-item form {
+    margin-left: auto;
+}
+
+.factura-item button.btn-small {
+    background-color: #6a1b9a;
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.factura-item button.btn-small:hover {
+    background-color: #8e24aa;
+}
+
+.paginacion {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.paginacion a {
+    color: #6a1b9a;
+    margin: 0 10px;
     text-decoration: none;
 }
 
-.btn-secondary:hover {
+.paginacion a:hover {
+    text-decoration: underline;
+}
+
+.boton-volver {
     background-color: #6a1b9a;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    display: inline-block;
+    margin-top: 40px;
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.boton-volver:hover {
+    background-color: #8e24aa;
+    transform: translateY(-2px);
+}
+
+/* Centra el contenedor de la tabla */
+.center-table {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh; /* Ajusta según lo que necesites */
+}
+
+/* Habitaciones container similar a facturas-container */
+.habitaciones-container {
+    max-width: 650px;
+    margin: 32px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 20px 12px;
+    text-align: center;
+}
+
+.habitaciones-container h2 {
+    margin-bottom: 24px;
+}
+
+.center-table {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Botón editar para habitaciones */
+.btn-edit {
+    background-color: #3284f0;
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+    margin-right: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+    display: inline-block;
+}
+
+.btn-edit:hover {
+    background-color: #1565c0;
+    transform: translateY(-2px);
+}
+
+/* Header específico para visualizar_habitaciones */
+.custom-header {
+    background-color: #6a1b9a;
+    padding: -5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.custom-header-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.logo-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.header-title {
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.report-form {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 650px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.report-form h2 {
+    color: #6a1b9a;
+    margin-bottom: 20px;
+}
+
+.report-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.report-form label {
+    font-weight: bold;
+    text-align: left;
+}
+
+.report-form input[type="date"] {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.result-container {
+    margin-top: 30px;
+    font-size: 1.2rem;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.facturas-list {
+    margin-top: 20px;
+    text-align: left;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.facturas-list ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.facturas-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Centrado vertical y horizontal para el formulario */
+.center-page {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
 }

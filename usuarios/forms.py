@@ -5,6 +5,7 @@ from .models import Reserva
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from datetime import date
 
 class CustomUserCreationForm(forms.ModelForm):
     password = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
@@ -35,7 +36,6 @@ class BuscarHabitacionForm(forms.Form):
         widget=forms.DateInput(attrs={'type': 'date'}),
         label="Fecha de salida"
     )
-    guests = forms.IntegerField(min_value=1, label="Cantidad de huéspedes")
 
     def clean_check_in(self):
         check_in = self.cleaned_data.get('check_in')
@@ -58,14 +58,29 @@ class HabitacionForm(forms.ModelForm):
         fields = ['numero', 'tipo', 'capacidad', 'precio_por_noche', 'disponible']
 
 
-
-
-
 class ReservaForm(forms.ModelForm):
     class Meta:
-     model = Reserva
-     fields = ['fecha_inicio', 'fecha_fin', 'habitacion']
-     widgets = {
-     'fecha_inicio': forms.DateInput(attrs={'type': 'date'}),
-      'fecha_fin': forms.DateInput(attrs={'type': 'date'}),
+        model = Reserva
+        fields = ['fecha_inicio', 'fecha_fin', 'habitacion']
+        widgets = {
+            'fecha_inicio': forms.DateInput(attrs={'type': 'date'}),
+            'fecha_fin': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get("fecha_inicio")
+        fecha_fin = cleaned_data.get("fecha_fin")
+
+        # Validación: que las fechas no estén vacías
+        if not fecha_inicio or not fecha_fin:
+            raise forms.ValidationError("Debes seleccionar ambas fechas.")
+
+        # Validación: que la fecha de inicio no sea en el pasado
+        if fecha_inicio < date.today():
+            self.add_error('fecha_inicio', "La fecha de check-in no puede ser anterior a hoy.")
+
+        # Validación: que la fecha de fin sea posterior a la de inicio
+        if fecha_fin <= fecha_inicio:
+            self.add_error('fecha_fin', "La fecha de check-out debe ser posterior a la de check-in.")
+

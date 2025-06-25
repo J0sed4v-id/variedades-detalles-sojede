@@ -1,62 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizar Habitaciones - OrquideaSuite</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo" class="logo">
-            <h1>Lista de Habitaciones</h1>
-        </div>
+    <header class="custom-header">
+    <div class="custom-header-content">
+        <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" class="logo-img">
+        <h1 class="header-title">Lista de Habitaciones</h1>
+    </div>
     </header>
+
 
     {% include 'usuarios/messages.html' %}
 
     <main class="main-content">
-        <section class="table-container">
-            <table class="material-table">
-                <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Tipo</th>
-                        <th>Capacidad</th>
-                        <th>Precio por noche</th>
-                        <th>Disponibilidad</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for habitacion in habitaciones %}
-                        <tr>
-                            <td>{{ habitacion.numero }}</td>
-                            <td>{{ habitacion.tipo }}</td>
-                            <td>{{ habitacion.capacidad }}</td>
-                            <td>${{ habitacion.precio_por_noche }}</td>
-                            <td class="{% if habitacion.disponible %}disponible{% else %}no-disponible{% endif %}">
-                                {{ habitacion.disponible|yesno:"Sí,No" }}
-                            </td>
-                            <td>
-                                <a href="{% url 'actualizar_habitacion' habitacion.id %}" class="btn-edit">Editar</a>
-                                
-                                <!-- Formulario de eliminación dentro de la misma tabla -->
-                                <form action="{% url 'eliminar_habitacion' habitacion.id %}" method="post" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-delete">Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </section>
-
-        <div class="button-group">
-            <a href="{% url 'crear_habitacion' %}" class="btn-primary">Crear Nueva Habitación</a>
-            <a href="{% url 'dashboard' %}">Dashboard</a>
+        <div class="habitaciones-container">
+            <h2>Lista de Habitaciones</h2>
+            <div class="center-table">
+                <section class="table-container">
+                    <table class="material-table">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Tipo</th>
+                                <th>Capacidad</th>
+                                <th>Precio por noche</th>
+                                <th>Disponibilidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for habitacion in habitaciones %}
+                                <tr>
+                                    <td>{{ habitacion.numero }}</td>
+                                    <td>{{ habitacion.tipo }}</td>
+                                    <td>{{ habitacion.capacidad }}</td>
+                                    <td>${{ habitacion.precio_por_noche }}</td>
+                                    <td class="{% if habitacion.disponible %}disponible{% else %}no-disponible{% endif %}">
+                                        {{ habitacion.disponible|yesno:"Sí,No" }}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'actualizar_habitacion' habitacion.id %}" class="btn-edit">Editar</a>
+                                        <form action="{% url 'eliminar_habitacion' habitacion.id %}" method="post" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-delete">Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+            <div class="button-group">
+                <a href="{% url 'crear_habitacion' %}" class="btn-dashboard">Crear Nueva Habitación</a>
+                <a href="{% url 'dashboard' %}" class="btn-dashboard">Dashboard</a>
+            </div>
         </div>
     </main>
 </body>

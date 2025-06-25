@@ -1,29 +1,62 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OrquideaSuite - Generar Informe de servicios adicionales</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <title>OrquideaSuite - Generar Informe de Ingresos</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-    <header>
-        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
-        <h1>Generar Informe de servicios adicionales</h1>
-        <button class="btn-logout" onclick="window.location.href='../dashboard.html'">Volver al Dashboard</button>
+    <header class="custom-header">
+        <div class="custom-header-content">
+            <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" class="logo-img">
+            <h1 class="header-title">Generar Informe de Ingresos</h1>
+        </div>
     </header>
 
-    <div class="form-container">
+    <div class="form-container report-form">
         <h2>Selecciona el período para generar el informe</h2>
-        <form action="#">
+        <!-- Después del form -->
+        <form method="post">
+            {% csrf_token %}
             <label for="start-date">Fecha de inicio:</label>
             <input type="date" id="start-date" name="start-date" required>
 
             <label for="end-date">Fecha de fin:</label>
             <input type="date" id="end-date" name="end-date" required>
 
-            <button type="submit" class="btn-action">Generar Informe</button>
+            <button type="submit" class="btn-primary">Generar Informe</button>
         </form>
+
+        <!-- Botón separado y centrado -->
+        <div class="button-center">
+            <a href="{% url 'dashboard' %}" class="btn-dashboard">Volver al Menú</a>
+        </div>
+
+
+        {% if total_ingresos is not None %}
+            <div class="result-container">
+                <h3>Total de ingresos: <strong>${{ total_ingresos }}</strong></h3>
+            </div>
+
+            <div class="facturas-list">
+                <h4>Facturas encontradas:</h4>
+                <ul>
+                    {% for factura in facturas %}
+                        <li>
+                            Reserva ID: {{ factura.reserva.id }},
+                            Habitación: {{ factura.reserva.habitacion.numero }},
+                            Fecha: {{ factura.reserva.fecha_inicio }} - {{ factura.reserva.fecha_fin }},
+                            Total: ${{ factura.total }}
+                        </li>
+                    {% empty %}
+                        <li>No se encontraron facturas en el rango especificado.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>

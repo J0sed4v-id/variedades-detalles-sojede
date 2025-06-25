@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Reservas - OrquideaSuite</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        .box-section {
+            background: #f3f4f6;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            padding: 15px 10px;
+            max-width: 320px;
+            /* Elimina el centrado automático para el layout en fila */
+            margin: 25px 0 0 0; /* aumentado el margen superior */
+        }
+        .box-section.reservas-activas {
+            max-width: 500px;
+            margin-top: 25px; /* también aumentado el margen superior */
+        }
+        .box-section.centrado {
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 5px;
+            margin-bottom: 0;
+            display: block;
+            height: 290px; /* mucho más reducido el alto */
+        }
+        .reservas-flex-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 8px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 700px) {
+            .reservas-flex-container {
+                flex-direction: column;
+                gap: 0;
+            }
+            .box-section,
+            .box-section.reservas-activas,
+            .box-section.centrado {
+                margin: 25px auto 0 auto;
+                max-width: 95vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="custom-header">
+        <div class="custom-header-content">
+            <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" class="logo-img">
+            <h1 class="header-title">Gestión de Reservas</h1>
+        </div>
+    </header>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Contenedor flex para reservar y ver reservas activas -->
+    <div class="reservas-flex-container">
+        <!-- Sección: Reservar habitación -->
+        <section>
+            <div class="box-section">
+                <h2>Reservar una habitación</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" name="reservar" class="btn-primary">Reservar</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Sección: Mis reservas activas -->
+        <section>
+            <div class="box-section reservas-activas">
+                <h2>Mis reservas activas</h2>
+                {% if reservas %}
+                    <ul class="lista-reservas">
+                        {% for reserva in reservas %}
+                            <li>
+                                <span>
+                                Habitación {{ reserva.habitacion.numero }} | {{ reserva.fecha_inicio|date:"d/m/Y" }} → {{ reserva.fecha_fin|date:"d/m/Y" }}
+                                </span>
+                                <form method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="reserva_id" value="{{ reserva.id }}">
+                                    <button type="submit" name="cancelar" class="btn-danger">Cancelar</button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No tienes reservas activas.</p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Sección: Modificar una reserva -->
+    <section>
+        <div class="box-section centrado" style="max-width: 600px;">
+            <h2>Modificar una reserva</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="reserva_id_modificar">Selecciona tu reserva:</label>
+                <select name="reserva_id_modificar" required>
+                    {% for reserva in reservas %}
+                        <option value="{{ reserva.id }}">
+                            Reserva {{ reserva.id }} - Habitación {{ reserva.habitacion.numero }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="nueva_fecha_inicio">Nueva Fecha de Check-In:</label>
+                <input type="date" name="nueva_fecha_inicio" required>
+
+                <label for="nueva_fecha_fin">Nueva Fecha de Check-Out:</label>
+                <input type="date" name="nueva_fecha_fin" required>
+
+                <button type="submit" name="modificar" class="btn-small">Modificar Reserva</button>
+            </form>
+        </div>
+    </section>
+
+    <div style="display:block; width:max-content; margin: -50px auto 0 70%; text-align:center;">
+        <a href="{% url 'dashboard' %}" class="btn-secondary">
+            Volver al Dashboard
+        </a>
+    </div>
+</body>
+</html>

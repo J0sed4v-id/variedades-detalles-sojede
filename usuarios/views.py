@@ -1,3 +1,4 @@
+from datetime import date
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
@@ -5,14 +6,14 @@ from django.http import HttpResponseBadRequest
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Sum
 from django.utils import timezone
 from django.core.paginator import Paginator
 from .forms import CustomUserCreationForm, BuscarHabitacionForm, HabitacionForm
-from .models import Habitacion, ServicioLavanderia, Reserva, Cliente
+from .models import Habitacion, Reserva, Cliente, Factura
 from .forms import ReservaForm
 from django.db import IntegrityError
-from .forms import ReservaForm
+from django.views.decorators.http import require_POST
 
 # Vista para el dashboard (requiere que el usuario esté autenticado)
 @login_required(login_url='iniciar_sesion')
@@ -116,12 +117,6 @@ def actualizar_habitacion(request, id):
 def eliminar_habitacion(request, id):
     habitacion = get_object_or_404(Habitacion, id=id)
 
-    # Eliminar los servicios de lavandería asociados
-    try:
-        ServicioLavanderia.objects.filter(habitacion=habitacion).delete()
-    except IntegrityError as e:
-        print(f"Error al eliminar los servicios de lavandería: {e}")
-
     # Eliminar la habitación
     habitacion.delete()
     return redirect('visualizar_habitaciones')
@@ -133,181 +128,169 @@ def visualizar_habitaciones(request):
     habitaciones = Habitacion.objects.all()
     return render(request, 'usuarios/visualizar_habitaciones.html', {'habitaciones': habitaciones})
 
+#_ _ _ _ _ _
 
-# Vista para reservar una habitación
 @login_required
-def reservar_habitacion(request):
-     if request.method == 'POST':
-        habitacion_id = request.POST.get('habitacion')
-        fecha_inicio = request.POST.get('fecha_check_in')
-        fecha_fin = request.POST.get('fecha_check_out')
+def gestionar_reservas(request):
+    usuario = request.user
+    cliente, _ = Cliente.objects.get_or_create(usuario=usuario)
+    reservas = Reserva.objects.filter(cliente=cliente, estado_reserva='reservada')
+    habitaciones_disponibles = Habitacion.objects.filter(disponible=True)
 
-        try:
-            # Validar que la habitación exista
-            habitacion = Habitacion.objects.get(id=habitacion_id)
-
-            # Verificar si la habitación está disponible
+    # --------------------- RESERVAR ---------------------
+    if request.method == 'POST' and 'reservar' in request.POST:
+        form = ReservaForm(request.POST)
+        form.fields['habitacion'].queryset = habitaciones_disponibles  # Filtrar habitaciones disponibles
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            habitacion = reserva.habitacion
             if habitacion.disponible:
-                habitacion.disponible = False  # Cambiar el estado de la habitación
+                habitacion.disponible = False
                 habitacion.save()
-
-                # Obtener o crear el cliente asociado al usuario
-                cliente, created = Cliente.objects.get_or_create(usuario=request.user)
-
-                # Crear la reserva
-                reserva = Reserva.objects.create(
-                    fecha_inicio=fecha_inicio,
-                    fecha_fin=fecha_fin,
-                    estado_reserva='reservada',
-                    habitacion=habitacion,
-                    cliente=cliente
-                )
-
-                # Notificar éxito
-                messages.success(request, f'¡Reserva realizada con éxito! La habitación {habitacion.numero} está ahora reservada.')
+                reserva.cliente = cliente
+                reserva.estado_reserva = 'reservada'
+                reserva.save()
+                messages.success(request, f'¡Reserva realizada con éxito para la habitación {habitacion.numero}!')
+                return redirect('gestionar_reservas')
             else:
                 messages.error(request, 'La habitación seleccionada no está disponible.')
+        else:
+            messages.error(request, 'Hay errores en el formulario. Por favor verifica los datos.')
 
-        except Habitacion.DoesNotExist:
-            messages.error(request, 'La habitación seleccionada no existe o no es válida.')
-        except Exception as e:
-            # Manejar otros errores inesperados
-            messages.error(request, f'Ocurrió un error al realizar la reserva: {str(e)}')
+    # --------------------- CANCELAR ---------------------
+    elif request.method == 'POST' and 'cancelar' in request.POST:
+        reserva_id = request.POST.get('reserva_id')
+        reserva = get_object_or_404(Reserva, id=reserva_id, cliente=cliente, estado_reserva='reservada')
+        reserva.estado_reserva = 'cancelada'
+        reserva.habitacion.disponible = True
+        reserva.habitacion.save()
+        reserva.save()
+        messages.success(request, f'Reserva para habitación {reserva.habitacion.numero} cancelada con éxito.')
+        return redirect('gestionar_reservas')
 
-        # Redirigir siempre al dashboard después del intento de reserva
-        return redirect('dashboard')
-
-    # Obtener habitaciones disponibles para la plantilla
-     habitaciones_disponibles = Habitacion.objects.filter(disponible=True)
-     return render(request, 'usuarios/reservar_habitacion.html', {'habitaciones_disponibles': habitaciones_disponibles})
-
-
-# Vista para solicitar un servicio (lavandería)
-@login_required
-def solicitar_servicio(request):
-    # Filtrar las habitaciones del usuario autenticado
-    habitaciones = Habitacion.objects.filter(usuario=request.user)
-
-    # Si el usuario no tiene habitaciones registradas, redirigirlo a la creación de habitación
-    if not habitaciones.exists():
-        messages.info(request, "No tienes habitaciones registradas. Por favor, crea una habitación antes de solicitar un servicio.")
-        return redirect('crear_habitacion')
-
-    # Manejar la solicitud POST para registrar el servicio
-    if request.method == 'POST':
-        habitacion_id = request.POST.get('habitacion')
-        descripcion = request.POST.get('descripcion', '').strip()
-        precio_servicio = request.POST.get('precio_servicio', 0)
+    # ---------------------- MODIFICAR ------------------------
+    elif request.method == 'POST' and 'modificar' in request.POST:
+        reserva_id = request.POST.get('reserva_id_modificar')
+        nueva_inicio = request.POST.get('nueva_fecha_inicio')
+        nueva_fin = request.POST.get('nueva_fecha_fin')
 
         try:
-            # Obtener la habitación seleccionada
-            habitacion = Habitacion.objects.get(id=habitacion_id, usuario=request.user)
-            # Crear un nuevo servicio de lavandería
-            ServicioLavanderia.objects.create(
-                usuario=request.user,
-                habitacion=habitacion,
-                descripcion=descripcion,
-                precio_servicio=precio_servicio,
-            )
-            messages.success(request, f"Servicio de lavandería registrado exitosamente para la habitación {habitacion.numero}.")
-            return redirect('visualizar_habitaciones')
-        except Habitacion.DoesNotExist:
-            messages.error(request, "La habitación seleccionada no es válida.")
+            reserva = Reserva.objects.get(id=reserva_id, cliente=cliente, estado_reserva='reservada')
+            reserva.fecha_inicio = nueva_inicio
+            reserva.fecha_fin = nueva_fin
+            reserva.save()
+            messages.success(request, f'Reserva {reserva.id} modificada con éxito.')
+        except Reserva.DoesNotExist:
+            messages.error(request, 'Reserva no encontrada para modificar.')
+        return redirect('gestionar_reservas')
 
-    # Renderizar la plantilla de solicitar servicio con las habitaciones del usuario
-    return render(request, 'usuarios/solicitar_servicio.html', {'habitaciones': habitaciones})
+    else:
+        form = ReservaForm()
+
+    context = {
+        'form': form,
+        'reservas': reservas,
+        'habitaciones_disponibles': habitaciones_disponibles,
+        'hoy': date.today()
+    }
+    return render(request, 'usuarios/gestionar_reservas.html', context)
+
+# _ _ _ _ _
+
 @login_required
 def visualizar_facturas(request):
-    # Lógica para obtener las facturas del usuario
-    facturas = []  # Aquí deberías obtener las facturas relacionadas con el usuario
-    return render(request, 'usuarios/visualizar_facturas.html', {'facturas': facturas})
+    cliente = Cliente.objects.filter(usuario=request.user).first()
 
-# Vista para modificar una reserva
-@login_required
-def modificar_reserva(request, id):
-    # Aquí deberías obtener la reserva según el 'id' y permitir que el usuario la modifique
-    reserva = get_object_or_404(Habitacion, id=id, usuario=request.user)  # Asumiendo que las reservas están relacionadas con habitaciones
-    
-    if request.method == 'POST':
-        form = HabitacionForm(request.POST, instance=reserva)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Reserva modificada con éxito.")
-            return redirect('visualizar_habitaciones')
-    else:
-        form = HabitacionForm(instance=reserva)
-    
-    return render(request, 'usuarios/modificar_reserva.html', {'form': form})
-
-
-
-# Vista para cancelar una reserva
-@login_required(login_url='iniciar_sesion')
-def cancelar_reserva(request):
-    # Solo obtener las reservas con estado 'reservada' y asociadas a una habitación no disponible.
-    if request.method == 'POST':
-        habitacion_id = request.POST.get('habitacion_id')
-        
-        try:
-            # Filtrar las reservas con estado 'reservada' y asociadas a la habitación que se seleccionó
-            reservas = Reserva.objects.filter(habitacion_id=habitacion_id, estado_reserva='reservada')
-
-            if reservas.count() == 1:
-                reserva = reservas.first()
-
-                # Cancelar la reserva
-                reserva.estado_reserva = 'cancelada'
-                reserva.habitacion.disponible = True  # Hacer disponible la habitación
-                reserva.habitacion.save()
-                reserva.save()
-
-                # Notificar al usuario
-                messages.success(request, f'¡Reserva para la habitación {reserva.habitacion.numero} cancelada con éxito!')
-            else:
-                messages.error(request, 'No se encontró una reserva válida para cancelar.')
-
-        except Exception as e:
-            messages.error(request, f'Ocurrió un error: {str(e)}')
-
+    if not cliente:
+        messages.error(request, "Tu usuario no está asociado a un cliente.")
         return redirect('dashboard')
 
-    # Si no es un POST, filtrar las habitaciones reservadas para mostrarlas en el formulario
-    habitaciones_reservadas = Habitacion.objects.filter(disponible=False)
-    
-    return render(request, 'usuarios/cancelar_reserva.html', {'habitaciones_reservadas': habitaciones_reservadas})
+    facturas_qs = Factura.objects.filter(usuario=request.user).select_related('reserva__habitacion').order_by('-id')
+
+    # Paginación
+    paginator = Paginator(facturas_qs, 10)  # 10 facturas por página
+    page_number = request.GET.get('page')
+    facturas_paginadas = paginator.get_page(page_number)
+
+    return render(request, 'usuarios/visualizar_facturas.html', {
+        'facturas': facturas_paginadas
+    })
 
 
 # Vista para generar una factura
 @login_required(login_url='iniciar_sesion')
 def generar_factura(request):
-    # Aquí se agregarán las funcionalidades para generar una factura
-    messages.info(request, "Funcionalidad para generar una factura aún no implementada.")
-    return render(request, 'usuarios/generar_factura.html')
+    cliente = Cliente.objects.filter(usuario=request.user).first()
 
-# Vista para generar un pago
-@login_required(login_url='iniciar_sesion')
-def generar_pago(request):
-    # Aquí se agregarán las funcionalidades para generar un pago
-    messages.info(request, "Funcionalidad para generar un pago aún no implementada.")
-    return render(request, 'usuarios/generar_pago.html')
+    if not cliente:
+        messages.error(request, "Tu usuario no está asociado a ningún cliente.")
+        return redirect('dashboard')
 
-# Vista para notificar un servicio
-@login_required(login_url='iniciar_sesion')
-def notificar_servicio(request):
-    # Aquí se agregarán las funcionalidades para notificar un servicio
-    messages.info(request, "Funcionalidad para notificar un servicio aún no implementada.")
-    return render(request, 'usuarios/notificar_servicio.html')
+    reserva_id = request.GET.get("reserva_id")
+
+    if reserva_id:
+        reserva = get_object_or_404(Reserva, id=reserva_id, cliente=cliente)
+
+        noches = (reserva.fecha_fin - reserva.fecha_inicio).days
+        precio_noche = reserva.habitacion.precio_por_noche if reserva.habitacion else 0
+        total = noches * precio_noche
+
+        factura, creada = Factura.objects.get_or_create(
+            reserva=reserva,
+            defaults={
+                'usuario': cliente.usuario,
+                'noches': noches,
+                'precio_por_noche': precio_noche,
+                'total': total,
+            }
+        )
+
+        return render(request, 'usuarios/generar_factura.html', {
+            'reserva_seleccionada': reserva,
+            'noches': noches,
+            'precio_noche': precio_noche,
+            'total': total,
+        })
+
+    reservas = Reserva.objects.filter(cliente=cliente, estado_reserva='reservada')
+
+    return render(request, 'usuarios/generar_factura.html', {
+        'reservas': reservas,
+    })
+
 
 # Vista para generar un informe de ingresos
 @login_required(login_url='iniciar_sesion')
 def generar_informe_ingresos(request):
-    # Aquí se agregarán las funcionalidades para generar un informe de ingresos
-    messages.info(request, "Funcionalidad para generar un informe de ingresos aún no implementada.")
-    return render(request, 'usuarios/generar_informe_ingresos.html')
+    total_ingresos = None
+    facturas_filtradas = []
 
-# Vista para solicitar un servicio (lavandería u otros)
-@login_required(login_url='iniciar_sesion')
-def solicitar_servicio(request):
-    # Aquí se agregarán las funcionalidades para solicitar un servicio
-    messages.info(request, "Funcionalidad para solicitar un servicio aún no implementada.")
-    return render(request, 'usuarios/solicitar_servicio.html')
+    if request.method == 'POST':
+        fecha_inicio = request.POST.get('start-date')
+        fecha_fin = request.POST.get('end-date')
+
+        if fecha_inicio and fecha_fin:
+            facturas_filtradas = Factura.objects.filter(
+                reserva__fecha_inicio__gte=fecha_inicio,
+                reserva__fecha_fin__lte=fecha_fin
+            )
+            total_ingresos = facturas_filtradas.aggregate(Sum('total'))['total__sum'] or 0
+        else:
+            messages.error(request, "Por favor selecciona ambas fechas.")
+
+    return render(request, 'usuarios/generar_informe_ingresos.html', {
+        'facturas': facturas_filtradas,
+        'total_ingresos': total_ingresos
+    })
+
+
+
+@require_POST
+@login_required
+def pagar_factura(request, factura_id):
+    factura = get_object_or_404(Factura, id=factura_id, usuario=request.user)
+    # Lógica básica de pago: marcar como pagada
+    factura.pagada = True  # Asegúrate de tener este campo en el modelo Factura
+    factura.save()
+    messages.success(request, "Factura pagada correctamente.")
+    return redirect('visualizar_facturas')

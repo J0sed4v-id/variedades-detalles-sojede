@@ -1,24 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizar Facturas - OrquideaSuite</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 </head>
 <body>
-    <header>
-        <img src="../images/orchid-logo.png" alt="OrquideaSuite Logo">
-        <h1>OrquideaSuite - Visualizar Facturas</h1>
+    <header class="custom-header">
+    <div class="custom-header-content">
+        <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" class="logo-img">
+        <h1 class="header-title">Visualizar Facturas</h1>
+    </div>
     </header>
 
-    <div class="container">
-        <h2>Lista de Facturas</h2>
-        <ul>
-            <li>Factura #001 - $250 - Pagada</li>
-            <li>Factura #002 - $180 - Pagada</li>
-            <li>Factura #003 - $300 - Pendiente</li>
-        </ul>
+    <div class="facturas-container">
+        <h2>Mis Facturas</h2>
+
+        {% if facturas %}
+            <ul>
+                {% for factura in facturas %}
+                    <li class="factura-item">
+                        <div>
+                            <strong>Reserva ID:</strong> {{ factura.reserva.id }} |
+                            <strong>Habitación:</strong> {{ factura.reserva.habitacion.numero }} |
+                            <strong>Desde:</strong> {{ factura.reserva.fecha_inicio }} |
+                            <strong>Hasta:</strong> {{ factura.reserva.fecha_fin }} |
+                            <strong>Total:</strong> ${{ factura.total|floatformat:2 }}
+                        </div>
+                        <form action="{% url 'pagar_factura' factura.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-small">Pagar</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="paginacion">
+                {% if facturas.has_previous %}
+                    <a href="?page={{ facturas.previous_page_number }}">Anterior</a>
+                {% endif %}
+                <span>Página {{ facturas.number }} de {{ facturas.paginator.num_pages }}</span>
+                {% if facturas.has_next %}
+                    <a href="?page={{ facturas.next_page_number }}">Siguiente</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <p>No se encontraron facturas.</p>
+        {% endif %}
+
+        <a href="{% url 'dashboard' %}" class="boton-volver">← Volver al Dashboard</a>
     </div>
 </body>
 </html>

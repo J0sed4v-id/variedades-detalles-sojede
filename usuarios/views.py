@@ -66,7 +66,7 @@ def buscar_habitaciones(request):
     if request.method == 'POST' and form.is_valid():
         check_in = form.cleaned_data['check_in']
         check_out = form.cleaned_data['check_out']
-        guests = form.cleaned_data['guests']
+       
 
         if check_in < timezone.now().date():
             form.add_error('check_in', "La fecha de entrada no puede ser en el pasado.")
@@ -75,7 +75,6 @@ def buscar_habitaciones(request):
         else:
             habitaciones_disponibles = Habitacion.objects.filter(
                 disponible=True,
-                capacidad__gte=guests
             )
 
     return render(request, 'usuarios/buscar_habitaciones.html', {

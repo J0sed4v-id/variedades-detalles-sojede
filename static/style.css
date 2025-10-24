@@ -1,618 +1,158 @@
-/* General styles for all pages */
+/* ===== GENERAL ===== */
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', sans-serif;
     margin: 0;
-    padding: 0;
-    background-color: #ffffff;
-    color: #333;
-    text-align: center;
+    background-color: #fff;
+    color: #000;
 }
 
-.title {
-    font-size: 2.5rem;
-    color: #ffffff;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    margin-right: 550px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Header */
-header {
+/* ===== HEADER ===== */
+.header-sojede {
+    background-color: #000;
+    color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #6a1b9a;
-    padding: 0.5rem;
-    height: 150px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 14px 60px;
+    border-bottom: 4px solid #d4af37;
 }
 
-header img {
-    width: 50px;
-    height: auto;
-    margin-right: 10px;
-    border-radius: 50%;
-    object-fit: cover;
-    aspect-ratio: 1/1;
-}
-
-header h1 {
-    font-size: 2rem;
-    color: white;
-    margin: 0;
-    position: center;
-}
-
-/* Container for content */
-.container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-/* Input and button styling */
-input, button {
-    display: block;
-    width: 100%;
-    margin-bottom: 20px;
-    padding: 15px;
-    border: none;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-size: 1rem;
-    text-align: center;
-}
-
-input[type="date"], input[type="number"], input[type="email"], input[type="password"] {
-    background-color: #f3f4f6;
-}
-
-button {
-    background-color: #6a1b9a;
-    color: white;
-}
-
-button:hover {
-    background-color: #8e24aa;
-}
-
-/* Footer */
-.footer {
-    text-align: center;
-    margin-top: 40px;
-    color: #888;
-}
-
-/* Grid layout */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 40px;
-}
-
-.grid-item {
-    background-color: #ffffff;
-    padding: 20px;
-    text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-}
-
-.grid-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Login and Registration Form Styles */
-.form-container, .login-container {
+.header-left {
     display: flex;
-    justify-content: center;
     align-items: center;
-    height: 80vh;
-    background-color: #f3f4f6;
+    gap: 45px;
 }
 
-.form-box, .login-box {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    text-align: center;
+.header-left img {
+    height: 90px;
+    width: auto;
+    border-radius: 4px;
 }
 
-.form-box h2, .login-box h2 {
-    color: #5E35B1;
-    margin-bottom: 20px;
+.nav-sojede a {
+    color: #d4af37;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 22px;
+    transition: 0.3s;
 }
 
-.form-box input, .login-box input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    outline: none;
-    text-align: center;
+.nav-sojede a.active {
+    text-decoration: underline;
+    text-underline-offset: 6px;
 }
 
-.form-box input:focus, .login-box input:focus {
-    border-color: #7E57C2;
+.nav-sojede a:hover {
+    color: #fff;
 }
 
-.form-box button, .login-box button {
-    background-color: #7E57C2;
-    color: white;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+.btn-logout-sojede {
+    background-color: #fff;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
     font-size: 16px;
 }
 
-.form-box button:hover, .login-box button:hover {
-    background-color: #5E35B1;
+.btn-logout-sojede:hover {
+    background-color: #d4af37;
+    color: #fff;
 }
 
-.form-box a.link, .login-box a.link {
-    color: #5E35B1;
-    text-decoration: none;
-    margin-top: 15px;
-    display: inline-block;
-}
-
-.form-box a.link:hover, .login-box a.link:hover {
-    text-decoration: underline;
-}
-
-/* User info and Logout button */
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: white;
-}
-
-.user-info span {
-    font-weight: bold;
-}
-
-.btn-logout {
-    background-color: #ff6666;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    border: none;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-size: 14px;
-}
-
-.btn-logout:hover {
-    background-color: #ff4d4d;
-}
-
-/* Dashboard cards */
-.card-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.card {
-    background-color: #ffffff;
-    border: none;
-    border-radius: 12px;
-    padding: 20px;
-    width: 220px;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    color: #5E35B1;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.card-icon {
-    font-size: 36px;
-    color: #6a1b9a;
-    margin-bottom: 10px;
-}
-
-.card h3 {
-    font-size: 1.2rem;
-    color: #6a1b9a;
-}
-
-.card p {
-    color: #757575;
-    font-size: 0.9rem;
-}
-
-/* Top bar */
-.top-bar {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background-color: #6a1b9a;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo img {
-    width: 50px;
-    height: auto;
-    margin-right: 0;
-}
-
-.top-bar h1 {
-    color: white;
-    margin: 0;
-    font-size: 2rem;
-    font-weight: normal;
-}
-
-/* Botón para redirigir al dashboard */
-.btn-dashboard {
-    background-color: #6a1b9a;
-    color: white;
-    padding: 15px 30px;
-    border-radius: 10px;
-    font-size: 1rem;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.3s, transform 0.3s;
-    display: inline-block;
-    margin: 20px 0;
-}
-
-.btn-dashboard:hover {
-    background-color: #8e24aa;
-    transform: translateY(-3px);
-}
-
-.btn-dashboard:active {
-    transform: translateY(0);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary {
-    background-color: #6a1b9a;
-    color: white;
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-size: 1rem;
-    text-decoration: none;
-    border: none;
-    display: inline-block;
-    margin-right: 10px;
-    transition: background-color 0.3s, transform 0.3s;
-    cursor: pointer;
-}
-
-.btn-primary:hover {
-    background-color: #8e24aa;
-    transform: translateY(-2px);
-}
-
-/* Responsividad */
-@media (max-width: 768px) {
-    header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .container {
-        padding: 10px;
-    }
-
-    .grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-
-    .form-box, .login-box {
-        width: 90%;
-    }
-
-    .btn-dashboard {
-        width: 100%;
-    }
-}
-
-/* Alert Styles */
-.alert {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 5px;
-    text-align: center;
-    color: #8e24aa;
-}
-
-.alert.success {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.alert.error {
-    background-color: #f44336;
-}
-
-/* Redirección */
-.btn-secondary:hover {
-    background-color: #6a1b9a;
-    text-decoration: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    color: white;
-    background-color: #8e24aa;
-}
-
-.btn-secondary {
-    text-align: center;
-    margin-top: 30px;
-}
-
-.redirect-button {
-    color: white;
-}
-
-/* -------------------------------------------
-   Estilos específicos para visualizar_facturas
-------------------------------------------- */
-.facturas-container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #f9f9f9;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-}
-
-.facturas-container h2 {
-    font-size: 2rem;
-    color: #6a1b9a;
-    margin-bottom: 30px;
-    font-weight: bold;
-}
-
-.facturas-container ul {
-    list-style: none;
-    padding: 0;
-    margin: 0 auto;
+/* ===== MAIN ===== */
+.main-sojede {
+    padding: 70px 90px;
     text-align: left;
 }
 
-.factura-item {
-    background-color: white;
-    margin-bottom: 20px;
-    padding: 20px;
-    border-left: 5px solid #6a1b9a;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    font-size: 1rem;
-    line-height: 1.6;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+.welcome-text {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 50px;
 }
 
-.factura-item form {
-    margin-left: auto;
+/* ===== DASHBOARD GRID ===== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px 60px;
+    justify-items: center;
 }
 
-.factura-item button.btn-small {
-    background-color: #6a1b9a;
-    color: white;
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.factura-item button.btn-small:hover {
-    background-color: #8e24aa;
-}
-
-.paginacion {
-    margin-top: 20px;
-    font-size: 0.95rem;
-    color: #555;
-}
-
-.paginacion a {
-    color: #6a1b9a;
-    margin: 0 10px;
-    text-decoration: none;
-}
-
-.paginacion a:hover {
-    text-decoration: underline;
-}
-
-.boton-volver {
-    background-color: #6a1b9a;
-    color: white;
-    padding: 12px 28px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 1rem;
-    display: inline-block;
-    margin-top: 40px;
-    transition: background-color 0.3s ease, transform 0.2s;
-}
-
-.boton-volver:hover {
-    background-color: #8e24aa;
-    transform: translateY(-2px);
-}
-
-/* Centra el contenedor de la tabla */
-.center-table {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh; /* Ajusta según lo que necesites */
-}
-
-/* Habitaciones container similar a facturas-container */
-.habitaciones-container {
-    max-width: 650px;
-    margin: 32px auto;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    padding: 20px 12px;
-    text-align: center;
-}
-
-.habitaciones-container h2 {
-    margin-bottom: 24px;
-}
-
-.center-table {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Botón editar para habitaciones */
-.btn-edit {
-    background-color: #3284f0;
-    color: #fff;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    text-decoration: none;
-    margin-right: 8px;
-    transition: background-color 0.3s, transform 0.2s;
-    display: inline-block;
-}
-
-.btn-edit:hover {
-    background-color: #1565c0;
-    transform: translateY(-2px);
-}
-
-/* Header específico para visualizar_habitaciones */
-.custom-header {
-    background-color: #6a1b9a;
-    padding: -5px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.custom-header-content {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-}
-
-.logo-img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
-}
-
-.header-title {
-    color: #fff;
-    font-size: 2.2rem;
-    font-weight: bold;
-    margin: 0;
-}
-
-.report-form {
+/* ===== CARD ===== */
+.dashboard-card {
     background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    max-width: 650px;
-    margin: 40px auto;
-    text-align: center;
-}
-
-.report-form h2 {
-    color: #6a1b9a;
-    margin-bottom: 20px;
-}
-
-.report-form form {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 520px;
+    padding: 35px 30px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.report-form label {
-    font-weight: bold;
+    align-items: flex-start;
+    justify-content: flex-start;
     text-align: left;
+    transition: transform 0.2s;
 }
 
-.report-form input[type="date"] {
-    padding: 10px;
-    border-radius: 8px;
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.dashboard-card img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 15px;
+    align-self: flex-start;
+}
+
+.dashboard-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+}
+
+.dashboard-card p {
+    color: #777;
+    font-size: 15px;
+    line-height: 1.4;
+    margin-bottom: 18px;
+}
+
+.btn-sojede {
+    background-color: #f3f3f3;
+    color: #000;
     border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.3s;
 }
 
-.result-container {
-    margin-top: 30px;
-    font-size: 1.2rem;
-    color: #4CAF50;
-    font-weight: bold;
+.btn-sojede:hover {
+    background-color: #d4af37;
+    color: #fff;
 }
 
-.facturas-list {
-    margin-top: 20px;
-    text-align: left;
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 10px;
+.btn-sojede.disabled {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
-.facturas-list ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.facturas-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid #ddd;
-}
-
-/* Centrado vertical y horizontal para el formulario */
-.center-page {
-    min-height: 90vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f3f4f6;
+/* ===== FOOTER ===== */
+.footer-sojede {
+    background-color: #000;
+    color: #d4af37;
+    text-align: center;
+    padding: 30px 0;
+    border-top: 4px solid #d4af37;
+    font-size: 14px;
+    line-height: 1.6;
 }

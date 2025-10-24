@@ -123,9 +123,21 @@ def eliminar_habitacion(request, id):
 
 # Vista para visualizar todas las habitaciones
 @login_required
-def visualizar_habitaciones(request):
+def gestionar_productos(request):
+    # gestión principal de "productos" reutilizando el modelo Habitacion
     habitaciones = Habitacion.objects.all()
-    return render(request, 'usuarios/visualizar_habitaciones.html', {'habitaciones': habitaciones})
+    form = HabitacionForm()
+
+    if request.method == 'POST':
+        form = HabitacionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('productos')
+
+    return render(request, 'usuarios/productos.html', {
+        'habitaciones': habitaciones,
+        'form': form
+    })
 
 #_ _ _ _ _ _
 

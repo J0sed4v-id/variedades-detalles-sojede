@@ -1,4 +1,4 @@
-/* General styles for all pages */
+/* ===== GENERAL ===== */
 body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
@@ -548,71 +548,12 @@ button:hover {
     font-size: 2.2rem;
     font-weight: bold;
     margin: 0;
-}
-
-.report-form {
     background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    max-width: 650px;
-    margin: 40px auto;
-    text-align: center;
+    color: #000;
 }
 
-.report-form h2 {
-    color: #6a1b9a;
-    margin-bottom: 20px;
-}
+/* ===== GLOBAL HEADER / COMMON STYLES (no dashboard specific rules here) ===== */
+/* ...otros estilos globales... */
 
-.report-form form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.report-form label {
-    font-weight: bold;
-    text-align: left;
-}
-
-.report-form input[type="date"] {
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-.result-container {
-    margin-top: 30px;
-    font-size: 1.2rem;
-    color: #4CAF50;
-    font-weight: bold;
-}
-
-.facturas-list {
-    margin-top: 20px;
-    text-align: left;
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 10px;
-}
-
-.facturas-list ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.facturas-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid #ddd;
-}
-
-/* Centrado vertical y horizontal para el formulario */
-.center-page {
-    min-height: 90vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f3f4f6;
-}
+/* Nota: los estilos específicos del dashboard se han movido a static/dashboard.css */
+/* Para la plantilla del dashboard carga: <link rel="stylesheet" href="{% static 'dashboard.css' %}"> */

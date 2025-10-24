@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de productos</title>
+    <link rel="stylesheet" href="{% static 'productos.css' %}">
+
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header-sojede">
+        <div class="header-left">
+            <img src="{% static 'images/logo.jpg' %}" alt="Logo Papelería">
+            <nav class="nav-sojede">
+                <a href="{% url 'dashboard' %}">Inicio</a>
+                <a href="#" class="active">Productos</a>
+                <a href="#">Inventario</a>
+                <a href="#">Compras</a>
+            </nav>
+        </div>
+        <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
+    </header>
+
+    <!-- Main -->
+    <main class="main-sojede">
+        <h2 class="section-title">Gestión de productos</h2>
+
+        <div class="form-container">
+            <div class="add-product">
+                <button class="btn-icon">+</button>
+                <span>Añadir producto</span>
+            </div>
+
+            <div class="form-line">
+                <label>Código:</label>
+                <input type="text" placeholder="xx">
+
+                <label>Nombre:</label>
+                <input type="text" placeholder="xxxxxx">
+
+                <label>Stock:</label>
+                <div class="stock-control">
+                    <button>-</button>
+                    <input type="number" placeholder="00">
+                    <button>+</button>
+                </div>
+
+                <label>Categoría:</label>
+                <input type="text" placeholder="xxxxxx">
+
+                <button class="btn-save">Guardar</button>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar productos">
+            <button class="btn-clear">×</button>
+        </div>
+
+        <!-- Table -->
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Producto</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td>...</td>
+                    <td class="actions">
+                        <button class="btn-action">✏️</button>
+                        <button class="btn-action">🗑️</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td><td>...</td><td>...</td><td>...</td>
+                    <td class="actions">
+                        <button class="btn-action">✏️</button>
+                        <button class="btn-action">🗑️</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-sojede">
+        <p>© 2025 — Sistema de Gestión de Inventario y Facturación.</p>
+        <p>soporte.sojede@gmail.com</p>
+    </footer>
+
+</body>
+</html>

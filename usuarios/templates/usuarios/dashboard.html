@@ -1,78 +1,72 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control - OrquideaSuite</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <title>Panel de Control - Papelería</title>
+    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 <body>
-    <!-- Barra superior -->
-    <header class="top-bar">
-        <div class="logo">
-            <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" style="width:120px;height:auto;display:block;">
-            <h1>Panel de Control</h1>
+
+    <!-- Header -->
+    <header class="header-sojede">
+        <div class="header-left">
+            <img src="{% static 'images/logo.jpg' %}" alt="Logo Papelería">
+            <nav class="nav-sojede">
+                <a href="{% url 'dashboard' %}" class="active">Inicio</a>
+                <a href="{% url 'productos' %}">Productos</a>
+                <a href="{% url 'inventario' %}">Inventario</a>
+                <a href="{% url 'compras' %}">Compras</a>
+            </nav>
         </div>
-        <div class="user-info">
-            <span>Bienvenido, {{ user.username }}</span>
-            <a href="{% url 'cerrar_sesion' %}" class="btn-logout">Cerrar sesión</a>
-        </div>
+        <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
     </header>
 
-    <!-- Mostrar los mensajes de éxito o error -->
-    {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
+    <!-- Main -->
+    <main class="main-sojede">
+        <h2 class="welcome-text">Bienvenido Administrador ....</h2>
+
+        <div class="dashboard-grid">
+            <!-- Productos -->
+            <div class="dashboard-card">
+                <img src="{% static 'images/productos.png' %}" alt="Productos">
+                <h3>Productos</h3>
+                <p>Añade, actualiza, busca y/o elimina tus productos</p>
+                <a href="{% url 'productos' %}" class="btn-sojede">Ir a gestionar productos</a>
+            </div>
+
+            <!-- Inventario -->
+            <div class="dashboard-card">
+                <img src="{% static 'images/inventarios.png' %}" alt="Inventario">
+                <h3>Inventario</h3>
+                <p>Maneja tu inventario de manera rápida y sencilla.</p>
+                <a href="{% url 'inventario' %}" class="btn-sojede">Ir a tu inventario</a>
+            </div>
+
+            <!-- Compras -->
+            <div class="dashboard-card">
+                <img src="{% static 'images/compras.png' %}" alt="Compras">
+                <h3>Compras</h3>
+                <p>Ingresa las compras realizadas</p>
+                <a href="{% url 'compras' %}" class="btn-sojede">Ir a registrar compras</a>
+            </div>
+
+            <!-- Facturas -->
+            <div class="dashboard-card">
+                <img src="{% static 'images/factura.png' %}" alt="Facturas">
+                <h3>Facturas</h3>
+                <p>................<br>próximamente................</p>
+                <a href="#" class="btn-sojede disabled">Ir a tus facturas</a>
+            </div>
         </div>
-    {% endif %}
+    </main>
 
-    <!-- Contenido del Dashboard -->
-    <div class="dashboard-container">
-        <h2>Selecciona una Acción</h2>
-        <div class="card-container">
-            <div class="card" onclick="window.location.href='{% url 'buscar_habitaciones' %}'">
-                <div class="card-icon">🛏️</div>
-                <h3>Buscar Habitaciones</h3>
-                <p>Encuentra habitaciones disponibles en el hotel.</p>
-            </div>
+    <!-- Footer -->
+    <footer class="footer-sojede">
+        <p>© 2025 — Sistema de Gestión de Inventario y Facturación.</p>
+        <p>soporte.sojede@gmail.com</p>
+    </footer>
 
-            <div class="card" onclick="window.location.href='{% url 'visualizar_habitaciones' %}'">
-                <div class="card-icon">👁️</div>
-                <h3>Visualizar Habitaciones</h3>
-                <p>Revisa todas las habitaciones del hotel y sus características.</p>
-            </div>
-
-            <div class="card" onclick="window.location.href='{% url 'gestionar_reservas' %}'">
-                <div class="card-icon">📝</div>
-                <h3>Gestionar Reservas</h3>
-                <p>Crea, modifica y/o elimina tus reservas..</p>
-            </div>
-
-            <div class="card" onclick="window.location.href='{% url 'visualizar_facturas' %}'">
-                <div class="card-icon">📄</div>
-                <h3>Visualizar Facturas</h3>
-                <p>Consulta las facturas de tus reservas y servicios.</p>
-            </div>
-
-            <div class="card" onclick="window.location.href='{% url 'generar_factura' %}'">
-                <div class="card-icon">💼</div>
-                <h3>Generar Factura</h3>
-                <p>Genera facturas detalladas de tus reservas y servicios.</p>
-            </div>
-
-            <div class="card" onclick="window.location.href='{% url 'generar_informe_ingresos' %}'">
-                <div class="card-icon">📊</div>
-                <h3>Generar Informes</h3>
-                <p>Genera informes detallados.</p>
-            </div>
-            
-        </div>
-    </div>
 </body>
 </html>

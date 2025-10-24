@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Papelería</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 <body>
 
@@ -15,9 +15,9 @@
             <img src="{% static 'images/logo.jpg' %}" alt="Logo Papelería">
             <nav class="nav-sojede">
                 <a href="{% url 'dashboard' %}" class="active">Inicio</a>
-                <a href="#">Productos</a>
-                <a href="#">Inventario</a>
-                <a href="#">Compras</a>
+                <a href="{% url 'productos' %}">Productos</a>
+                <a href="{% url 'inventario' %}">Inventario</a>
+                <a href="{% url 'compras' %}">Compras</a>
             </nav>
         </div>
         <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
@@ -33,7 +33,7 @@
                 <img src="{% static 'images/productos.png' %}" alt="Productos">
                 <h3>Productos</h3>
                 <p>Añade, actualiza, busca y/o elimina tus productos</p>
-                <a href="#" class="btn-sojede">Ir a gestionar productos</a>
+                <a href="{% url 'productos' %}" class="btn-sojede">Ir a gestionar productos</a>
             </div>
 
             <!-- Inventario -->
@@ -41,7 +41,7 @@
                 <img src="{% static 'images/inventarios.png' %}" alt="Inventario">
                 <h3>Inventario</h3>
                 <p>Maneja tu inventario de manera rápida y sencilla.</p>
-                <a href="#" class="btn-sojede">Ir a tu inventario</a>
+                <a href="{% url 'inventario' %}" class="btn-sojede">Ir a tu inventario</a>
             </div>
 
             <!-- Compras -->
@@ -49,7 +49,7 @@
                 <img src="{% static 'images/compras.png' %}" alt="Compras">
                 <h3>Compras</h3>
                 <p>Ingresa las compras realizadas</p>
-                <a href="#" class="btn-sojede">Ir a registrar compras</a>
+                <a href="{% url 'compras' %}" class="btn-sojede">Ir a registrar compras</a>
             </div>
 
             <!-- Facturas -->

@@ -1,0 +1,156 @@
+/* ===== DASHBOARD / SOJEDE STYLES (extraído de style.css) ===== */
+
+/* HEADER */
+.header-sojede {
+    background-color: #000;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 60px;
+    border-bottom: 4px solid #d4af37;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 45px;
+}
+
+.header-left img {
+    height: 90px;
+    width: auto;
+    border-radius: 4px;
+}
+
+.nav-sojede a {
+    color: #d4af37;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 22px;
+    transition: 0.3s;
+}
+
+.nav-sojede a.active {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+}
+
+.nav-sojede a:hover {
+    color: #fff;
+}
+
+.btn-logout-sojede {
+    background-color: #fff;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+    font-size: 16px;
+}
+
+.btn-logout-sojede:hover {
+    background-color: #d4af37;
+    color: #fff;
+}
+
+/* MAIN */
+.main-sojede {
+    padding: 70px 90px;
+    text-align: left;
+}
+
+.welcome-text {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 50px;
+}
+
+/* DASHBOARD GRID */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px 60px;
+    justify-items: center;
+}
+
+/* CARD */
+.dashboard-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 520px;
+    padding: 35px 30px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    transition: transform 0.2s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.dashboard-card img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 15px;
+    align-self: flex-start;
+}
+
+.dashboard-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+}
+
+.dashboard-card p {
+    color: #777;
+    font-size: 15px;
+    line-height: 1.4;
+    margin-bottom: 18px;
+}
+
+.btn-sojede {
+    background-color: #f3f3f3;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.btn-sojede:hover {
+    background-color: #d4af37;
+    color: #fff;
+}
+
+.btn-sojede.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* FOOTER (dashboard) - más alto para "llenar" el fondo */
+.footer-sojede {
+    background-color: #000;
+    color: #d4af37;
+    text-align: center;
+    padding: 40px 0;
+    margin-top: 0;
+    border-top: 3px solid #d4af37;
+    font-size: 14px;
+    line-height: 1.6;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 120px;
+}

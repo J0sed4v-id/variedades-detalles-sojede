@@ -23,7 +23,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #6a1b9a;
+    background-color: black;
     padding: 0.5rem;
     height: 150px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);

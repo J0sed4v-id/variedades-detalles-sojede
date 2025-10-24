@@ -1,0 +1,181 @@
+/* ======== Estilos específicos para inicio.html ======== */
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* ======== Header ======== */
+header {
+  width: 100%;
+  background-color: #000000;
+  color: #ffffff;
+  text-align: center;
+  padding: 20px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+header img {
+  margin: 0 auto 10px auto;
+}
+
+header h1 {
+  font-size: 24px;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* ======== Contenedor del formulario ======== */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  padding: 40px 0;
+}
+
+.login-box {
+  background-color: #ffffff;
+  border: 2px solid #d4af37; /* dorado */
+  border-radius: 12px;
+  width: 350px;
+  padding: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-top: 80px;
+}
+
+/* ======== Texto ======== */
+.login-box h2 {
+  color: #000000;
+  margin-bottom: 25px;
+  font-size: 22px;
+}
+
+/* ======== Campos ======== */
+label {
+  display: block;
+  text-align: left;
+  color: #000000;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #d4af37;
+  border-radius: 6px;
+  outline: none;
+  color: #000000;
+  background-color: #fff;
+}
+
+input::placeholder {
+  color: #555;
+}
+
+/* ======== Botón ======== */
+button.btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #d4af37;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button.btn:hover {
+  background-color: #b9932f;
+}
+
+/* ======== Enlace inferior ======== */
+p {
+  color: #000000;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+a {
+  color: #d4af37;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ======== Mensajes ======== */
+.alert {
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.alert.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #81c784;
+}
+
+.alert.error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+
+.top-img {
+    position: fixed;
+    bottom: 550px;
+    right: 890px;
+    width: 150px !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
+
+
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #000000; /* negro elegante */
+  text-align: center;
+  padding: 10px 0;
+  font-size: 50px;
+  
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* .footer p {
+  margin: 0;
+} */
+
+.login-container {
+    padding-bottom: 100px; /* espacio suficiente para que el footer no tape el contenido */
+}
+
+footer, footer p {
+    color: #bfa14a !important; /* forzamos el color dorado */
+}

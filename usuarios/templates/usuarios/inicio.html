@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OrquideaSuite - Inicio de Sesión</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'inicio.css' %}">
 </head>
 <body>
     <header>
-        <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" style="width:120px;height:auto;display:block;">
-        <h1>Bienvenido a OrquideaSuite</h1>
+        <img src="{% static 'images/logo.jpg' %}" alt="Sojede Logo" style="width:120px;height:auto;display:block;">
+        <h1>Bienvenido a Sojede</h1>
     </header>
 
     <!-- Bloque para mostrar mensajes de éxito o error -->
@@ -23,6 +23,11 @@
     {% endif %}
 
     <div class="login-container">
+        <div class="top-image">
+        <img src="{% static 'images/login_user.jpg' %}" alt="Imagen superior" class="top-img">
+    </div>
+
+
         <div class="login-box">
             <h2>Iniciar Sesión</h2>
             <form action="{% url 'iniciar_sesion' %}" method="post">
@@ -39,4 +44,8 @@
         </div>
     </div>
 </body>
+
+<footer class="footer">
+    <p>© 2025 Variedades y Detalles Sojede — Todos los derechos reservados</p>
+</footer>
 </html>

@@ -121,6 +121,9 @@ def eliminar_habitacion(request, id):
     return redirect('visualizar_habitaciones')
 
 
+
+
+
 # Vista para visualizar todas las habitaciones
 @login_required
 def gestionar_productos(request):
@@ -140,6 +143,79 @@ def gestionar_productos(request):
     })
 
 #_ _ _ _ _ _
+
+
+
+#vista para gestionar compras (visualizar productos y historial de compras)
+@login_required
+def gestionar_compras(request):
+    usuario = request.user
+    cliente, _ = Cliente.objects.get_or_create(usuario=usuario)
+    
+    # Productos disponibles
+    productos = Habitacion.objects.filter(disponible=True)
+    
+    # Historial de compras del cliente
+    compras = Reserva.objects.filter(cliente=cliente).order_by('-id')
+    paginator = Paginator(compras, 10)
+    page_number = request.GET.get('page')
+    compras_paginadas = paginator.get_page(page_number)
+    
+    if request.method == 'POST':
+        producto_id = request.POST.get('producto_id')
+        producto = Habitacion.objects.get(id=producto_id)
+        
+        # Crear una "compra" usando Reserva como base
+        compra = Reserva.objects.create(
+            cliente=cliente,
+            habitacion=producto,
+            fecha_inicio=date.today(),
+            fecha_fin=date.today(),  # se puede ajustar según la lógica de la compra
+            estado_reserva='comprada'  # nuevo estado para compras
+        )
+        
+        messages.success(request, f'Has comprado el producto {producto.numero} correctamente.')
+        return redirect('compras')
+    
+    return render(request, 'usuarios/compras.html', {
+        'productos': productos,
+        'compras': compras_paginadas
+    })
+
+
+# Vista para pagar una compra
+@login_required
+def pagar_compra(request, compra_id):
+    compra = get_object_or_404(Reserva, id=compra_id, cliente__usuario=request.user, estado_reserva='comprada')
+    compra.pagada = True  # asegúrate de tener este campo en Reserva o en Factura
+    compra.save()
+    messages.success(request, f'Compra del producto {compra.habitacion.numero} pagada correctamente.')
+    return redirect('compras')
+
+# Vista para comprar un producto
+@login_required
+def comprar_producto(request, producto_id):
+    usuario = request.user
+    cliente, _ = Cliente.objects.get_or_create(usuario=usuario)
+    producto = get_object_or_404(Habitacion, id=producto_id)
+
+    # Crear la compra (usaremos Reserva como compra temporal)
+    reserva = Reserva.objects.create(
+        cliente=cliente,
+        habitacion=producto,
+        fecha_inicio=timezone.now(),
+        fecha_fin=timezone.now(),  # opcional, si no hay fecha de salida
+        estado_reserva='reservada'  # temporal, podemos usarlo como 'pendiente pago'
+    )
+
+    messages.success(request, f'Has comprado el producto {producto.numero} correctamente.')
+    return redirect('compras')
+
+
+
+
+
+
 
 @login_required
 def gestionar_reservas(request):

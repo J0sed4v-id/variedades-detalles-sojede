@@ -16,9 +16,9 @@
             <img src="{% static 'images/logo.jpg' %}" alt="Logo Papelería">
             <nav class="nav-sojede">
                 <a href="{% url 'dashboard' %}">Inicio</a>
-                <a href="#" class="active">Productos</a>
-                <a href="#">Inventario</a>
-                <a href="#">Compras</a>
+                <a href="{% url 'productos' %}" class="{% if request.resolver_match.url_name == 'productos' %}active{% endif %}">Productos</a>
+                 <a href="{% url 'inventario' %}" class="{% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">Inventario</a>
+                 <a href="{% url 'compras' %}" class="{% if request.resolver_match.url_name == 'compras' %}active{% endif %}">Compras</a>
             </nav>
         </div>
         <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>

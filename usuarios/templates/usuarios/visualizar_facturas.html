@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizar Facturas - OrquideaSuite</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <title>Compras - Sojede</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'compras.css' %}">
 </head>
 <body>
     <header class="custom-header">
     <div class="custom-header-content">
-        <img src="{% static 'images/orchid-logo.png' %}" alt="OrquideaSuite Logo" class="logo-img">
-        <h1 class="header-title">Visualizar Facturas</h1>
+        <img src="{% static 'images/logo.jpg' %}" alt="Sojede Logo" class="logo-img">
+        <h1 class="header-title">Compras</h1>
     </div>
     </header>
 
     <div class="facturas-container">
-        <h2>Mis Facturas</h2>
+        <h2>Mis Compras</h2>
 
         {% if facturas %}
             <ul>
@@ -53,4 +53,8 @@
         <a href="{% url 'dashboard' %}" class="boton-volver">← Volver al Dashboard</a>
     </div>
 </body>
+<footer class="footer">
+    <p>© 2025 Variedades y Detalles Sojede — Todos los derechos reservados</p>
+    <p>soporte.sojede@gmail.com</p>
+</footer>
 </html>

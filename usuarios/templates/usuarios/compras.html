@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compras - Sojede</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'compras.css' %}">
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="header-sojede">
+        <div class="header-left">
+            <img src="{% static 'images/logo.jpg' %}" alt="Logo Sojede" class="logo-img">
+            <!-- <h1 class="header-title">Compras</h1> -->
+            <nav class="nav-sojede">
+                <a href="{% url 'dashboard' %}">Inicio</a>
+                 <a href="{% url 'productos' %}" class="{% if request.resolver_match.url_name == 'productos' %}active{% endif %}">Productos</a>
+                 <a href="{% url 'inventario' %}" class="{% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">Inventario</a>
+                 <a href="{% url 'compras' %}" class="{% if request.resolver_match.url_name == 'compras' %}active{% endif %}">Compras</a>
+            </nav>
+        </div>
+        <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
+    </header>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="main-sojede">
+        <!-- Lista de productos disponibles -->
+        <div class="facturas-container">
+            <h2>Productos disponibles</h2>
+
+            {% if productos %}
+                <ul>
+                    {% for producto in productos %}
+                        <li class="factura-item">
+                            <div>
+                                <strong>Producto:</strong> {{ producto.numero }} |
+                                <strong>Precio:</strong> ${{ producto.precio_por_noche|floatformat:2 }}
+                            </div>
+                            <form action="{% url 'compras' %}" method="post">
+                              {% csrf_token %}
+                             <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                             <button type="submit" class="btn-small">Comprar</button>
+                             </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No hay productos disponibles.</p>
+            {% endif %}
+        </div>
+
+        <!-- Historial de compras -->
+        <div class="facturas-container">
+            <h2>Mis Compras</h2>
+
+            {% if compras %}
+                <ul>
+                    {% for compra in compras %}
+                        <li class="factura-item">
+                            <div>
+                                <strong>Producto:</strong> {{ compra.habitacion.numero }} |
+                                <strong>Precio:</strong> ${{ compra.habitacion.precio_por_noche|floatformat:2 }} |
+                                <strong>Fecha:</strong> {{ compra.fecha_inicio }}
+                            </div>
+                            {% if not compra.pagada %}
+                            <form action="{% url 'pagar_compra' compra.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-small">Pagar</button>
+                            </form>
+                            {% else %}
+                                <span style="color: green; font-weight: 600;">Pagada</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="paginacion">
+                    {% if compras.has_previous %}
+                        <a href="?page={{ compras.previous_page_number }}">Anterior</a>
+                    {% endif %}
+                    <span>Página {{ compras.number }} de {{ compras.paginator.num_pages }}</span>
+                    {% if compras.has_next %}
+                        <a href="?page={{ compras.next_page_number }}">Siguiente</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p>No se encontraron compras.</p>
+            {% endif %}
+
+            <a href="{% url 'dashboard' %}" class="boton-volver">← Volver al Dashboard</a>
+        </div>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer-sojede">
+        <p>© 2025 Variedades y Detalles Sojede — Todos los derechos reservados</p>
+        <p>soporte.sojede@gmail.com</p>
+    </footer>
+</body>
+</html>

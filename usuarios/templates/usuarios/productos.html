@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de productos</title>
     <link rel="stylesheet" href="{% static 'productos.css' %}">
-
 </head>
 <body>
 
@@ -16,9 +15,9 @@
             <img src="{% static 'images/logo.jpg' %}" alt="Logo Papelería">
             <nav class="nav-sojede">
                 <a href="{% url 'dashboard' %}">Inicio</a>
-                <a href="{% url 'productos' %}" class="{% if request.resolver_match.url_name == 'productos' %}active{% endif %}">Productos</a>
-                 <a href="{% url 'inventario' %}" class="{% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">Inventario</a>
-                 <a href="{% url 'compras' %}" class="{% if request.resolver_match.url_name == 'compras' %}active{% endif %}">Compras</a>
+                <a href="{% url 'productos' %}" class="active">Productos</a>
+                <a href="{% url 'inventario' %}">Inventario</a>
+                <a href="{% url 'compras' %}">Compras</a>
             </nav>
         </div>
         <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
@@ -28,68 +27,72 @@
     <main class="main-sojede">
         <h2 class="section-title">Gestión de productos</h2>
 
+        <!-- FORMULARIO PARA AGREGAR O EDITAR PRODUCTOS -->
         <div class="form-container">
-            <div class="add-product">
-                <button class="btn-icon">+</button>
-                <span>Añadir producto</span>
-            </div>
+            <form method="POST" action="{% url 'agregar_producto' %}">
+                {% csrf_token %}
+                <!-- Campo oculto para editar -->
+                <input type="hidden" name="id" id="producto_id">
 
-            <div class="form-line">
-                <label>Código:</label>
-                <input type="text" placeholder="xx">
+                <div class="form-line">
+                    <label for="codigo">Código:</label>
+                    <input type="text" name="codigo" id="codigo" placeholder="xx" required>
 
-                <label>Nombre:</label>
-                <input type="text" placeholder="xxxxxx">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" name="nombre" id="nombre" placeholder="xxxxxx" required>
 
-                <label>Stock:</label>
-                <div class="stock-control">
-                    <button>-</button>
-                    <input type="number" placeholder="00">
-                    <button>+</button>
+                    <label for="stock">Stock:</label>
+                    <input type="number" name="stock" id="stock" placeholder="00" min="0" required>
+
+                    <label for="categoria">Categoría:</label>
+                    <input type="text" name="categoria" id="categoria" placeholder="xxxxxx" required>
+
+                    <button type="submit" class="btn-save" id="btnGuardar">Guardar</button>
                 </div>
-
-                <label>Categoría:</label>
-                <input type="text" placeholder="xxxxxx">
-
-                <button class="btn-save">Guardar</button>
-            </div>
+            </form>
         </div>
 
         <!-- Search -->
         <div class="search-bar">
-            <input type="text" placeholder="Buscar productos">
-            <button class="btn-clear">×</button>
+            <form method="GET" action="{% url 'productos' %}">
+                <input type="text" name="q" placeholder="Buscar productos" value="{{ request.GET.q }}">
+                <button type="submit" class="btn-clear">🔍</button>
+            </form>
         </div>
 
-        <!-- Table -->
+        <!-- Tabla de productos -->
         <table class="products-table">
             <thead>
                 <tr>
                     <th>Código</th>
                     <th>Nombre</th>
-                    <th>Producto</th>
                     <th>Stock</th>
+                    <th>Categoría</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
+                {% for producto in productos %}
                 <tr>
-                    <td>1</td>
-                    <td>...</td>
-                    <td>...</td>
-                    <td>...</td>
+                    <td>{{ producto.codigo }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.stock }}</td>
+                    <td>{{ producto.categoria }}</td>
                     <td class="actions">
-                        <button class="btn-action">✏️</button>
-                        <button class="btn-action">🗑️</button>
+                        <!-- Botón Editar -->
+                        <a href="#" class="btn-action" 
+                           onclick="editarProducto('{{ producto.id }}', '{{ producto.codigo }}', '{{ producto.nombre }}', '{{ producto.stock }}', '{{ producto.categoria }}')">✏️</a>
+
+                        <!-- Botón Eliminar -->
+                        <a href="{% url 'eliminar_producto' producto.id %}" class="btn-action" 
+                           onclick="return confirm('¿Seguro que deseas eliminar este producto?')">🗑️</a>
                     </td>
                 </tr>
+                {% empty %}
                 <tr>
-                    <td>2</td><td>...</td><td>...</td><td>...</td>
-                    <td class="actions">
-                        <button class="btn-action">✏️</button>
-                        <button class="btn-action">🗑️</button>
-                    </td>
+                    <td colspan="5">No hay productos registrados.</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </main>
@@ -99,6 +102,30 @@
         <p>© 2025 — Sistema de Gestión de Inventario y Facturación.</p>
         <p>soporte.sojede@gmail.com</p>
     </footer>
+
+    <!-- Script para rellenar el formulario -->
+    <script>
+    function editarProducto(id, codigo, nombre, stock, categoria) {
+        document.getElementById('producto_id').value = id;
+        document.getElementById('codigo').value = codigo;
+        document.getElementById('nombre').value = nombre;
+        document.getElementById('stock').value = stock;
+        document.getElementById('categoria').value = categoria;
+        document.getElementById('btnGuardar').textContent = 'Actualizar';
+    }
+
+    // Restablecer el formulario al enviar
+    document.querySelector('form').addEventListener('submit', function() {
+        setTimeout(() => {
+            document.getElementById('producto_id').value = '';
+            document.getElementById('codigo').value = '';
+            document.getElementById('nombre').value = '';
+            document.getElementById('stock').value = '';
+            document.getElementById('categoria').value = '';
+            document.getElementById('btnGuardar').textContent = 'Guardar';
+        }, 500);
+    });
+    </script>
 
 </body>
 </html>

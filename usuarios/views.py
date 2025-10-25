@@ -14,6 +14,7 @@ from .models import Habitacion, Reserva, Cliente, Factura
 from .forms import ReservaForm
 from django.db import IntegrityError
 from django.views.decorators.http import require_POST
+from .models import Producto
 
 # Vista para el dashboard (requiere que el usuario esté autenticado)
 @login_required(login_url='iniciar_sesion')
@@ -82,6 +83,9 @@ def buscar_habitaciones(request):
         'habitaciones_disponibles': habitaciones_disponibles
     })
 
+
+
+
 # Vista para crear una nueva habitación
 @login_required
 def crear_habitacion(request):
@@ -122,7 +126,7 @@ def eliminar_habitacion(request, id):
 
 
 
-
+#/////////////////////////////////////////////////////////////////////////////////////
 
 # Vista para visualizar todas las habitaciones
 @login_required
@@ -142,8 +146,71 @@ def gestionar_productos(request):
         'form': form
     })
 
-#_ _ _ _ _ _
 
+
+#/////////////////////////////////////////////////////////////////////////////////////
+
+#vista del crud 
+# ------------------ CRUD PRODUCTOS ------------------
+
+@login_required
+def listar_productos(request):
+    productos = Producto.objects.all()
+    return render(request, 'usuarios/productos.html', {'productos': productos})
+
+#//////////////////////////////////////////////////////////////////////////////////////
+@login_required
+def agregar_producto(request):
+    if request.method == "POST":
+        id_producto = request.POST.get("id")  # Campo oculto del formulario
+        codigo = request.POST.get("codigo")
+        nombre = request.POST.get("nombre")
+        stock = request.POST.get("stock")
+        categoria = request.POST.get("categoria")
+
+        if id_producto:  # Editar producto existente
+            producto = get_object_or_404(Producto, id=id_producto)
+
+            # Evitar duplicado de código
+            if Producto.objects.filter(codigo=codigo).exclude(id=id_producto).exists():
+                messages.error(request, f"⚠️ Ya existe un producto con el código {codigo}.")
+                return redirect('productos')
+
+            producto.codigo = codigo
+            producto.nombre = nombre
+            producto.stock = stock
+            producto.categoria = categoria
+            producto.save()
+            messages.success(request, f"✅ Producto '{producto.nombre}' actualizado correctamente.")
+
+        else:  # Crear nuevo producto
+            if Producto.objects.filter(codigo=codigo).exists():
+                messages.error(request, f"⚠️ El producto con código {codigo} ya existe.")
+                return redirect('productos')
+
+            Producto.objects.create(
+                codigo=codigo,
+                nombre=nombre,
+                stock=stock,
+                categoria=categoria
+            )
+            messages.success(request, "✅ Producto guardado exitosamente.")
+
+        return redirect('productos')
+
+    # Si no es POST, mostramos la lista
+    productos = Producto.objects.all()
+    return render(request, 'usuarios/productos.html', {'productos': productos})
+
+
+@login_required
+def eliminar_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+    producto.delete()
+    messages.success(request, 'Producto eliminado correctamente.')
+    return redirect('productos')
+
+#//////////////////////////////////////////////////////////////////////////////////////////
 
 
 #vista para gestionar compras (visualizar productos y historial de compras)

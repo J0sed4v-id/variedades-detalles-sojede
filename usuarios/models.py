@@ -18,6 +18,22 @@ METODO_PAGO_CHOICES = [
     ('efectivo', 'Efectivo'),
 ]
 
+
+#Modelo productos
+
+class Producto(models.Model):
+    codigo = models.CharField(max_length=20, unique=True)
+    nombre = models.CharField(max_length=100)
+    stock = models.PositiveIntegerField()
+    categoria = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.nombre} ({self.codigo})"
+
+
+
+
+
 # Modelo Habitacion
 class Habitacion(models.Model): 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

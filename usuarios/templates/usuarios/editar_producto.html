@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar producto</title>
+    <link rel="stylesheet" href="{% static 'productos.css' %}">
+</head>
+<body>
+    <h2>Editar producto</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Código:</label>
+        <input type="text" name="codigo" value="{{ producto.codigo }}" required>
+
+        <label>Nombre:</label>
+        <input type="text" name="nombre" value="{{ producto.nombre }}" required>
+
+        <label>Stock:</label>
+        <input type="number" name="stock" value="{{ producto.stock }}" required>
+
+        <label>Categoría:</label>
+        <input type="text" name="categoria" value="{{ producto.categoria }}" required>
+
+        <button type="submit">Guardar cambios</button>
+        <a href="{% url 'productos' %}">Cancelar</a>
+    </form>
+</body>
+</html>

@@ -12,12 +12,11 @@
     <header class="header-sojede">
         <div class="header-left">
             <img src="{% static 'images/logo.jpg' %}" alt="Logo Sojede" class="logo-img">
-            <!-- <h1 class="header-title">Compras</h1> -->
             <nav class="nav-sojede">
                 <a href="{% url 'dashboard' %}">Inicio</a>
-                 <a href="{% url 'productos' %}" class="{% if request.resolver_match.url_name == 'productos' %}active{% endif %}">Productos</a>
-                 <a href="{% url 'inventario' %}" class="{% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">Inventario</a>
-                 <a href="{% url 'compras' %}" class="{% if request.resolver_match.url_name == 'compras' %}active{% endif %}">Compras</a>
+                <a href="{% url 'productos' %}" class="{% if request.resolver_match.url_name == 'productos' %}active{% endif %}">Productos</a>
+                <a href="{% url 'inventario' %}" class="{% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">Inventario</a>
+                <a href="{% url 'compras' %}" class="{% if request.resolver_match.url_name == 'compras' %}active{% endif %}">Compras</a>
             </nav>
         </div>
         <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
@@ -27,21 +26,29 @@
     <main class="main-sojede">
         <!-- Lista de productos disponibles -->
         <div class="facturas-container">
-            <h2>Productos disponibles</h2>
+            <h2>🛒 Productos disponibles</h2>
 
             {% if productos %}
                 <ul>
                     {% for producto in productos %}
                         <li class="factura-item">
                             <div>
-                                <strong>Producto:</strong> {{ producto.numero }} |
-                                <strong>Precio:</strong> ${{ producto.precio_por_noche|floatformat:2 }}
+                                <strong>Nombre:</strong> {{ producto.nombre }} |
+                                <strong>Categoría:</strong> {{ producto.categoria }} |
+                                <strong>Código:</strong> {{ producto.codigo }} |
+                                <strong>Stock:</strong> {{ producto.stock }}
                             </div>
+
+                            {% if producto.stock > 0 %}
+                                <!-- ✅ Formulario corregido -->
                             <form action="{% url 'compras' %}" method="post">
-                              {% csrf_token %}
-                             <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                             <button type="submit" class="btn-small">Comprar</button>
-                             </form>
+                                {% csrf_token %}
+                                <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                <button type="submit" class="btn-small">Comprar</button>
+                            </form>
+                            {% else %}
+                                <span style="color: red; font-weight: bold;">Agotado</span>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
@@ -52,40 +59,23 @@
 
         <!-- Historial de compras -->
         <div class="facturas-container">
-            <h2>Mis Compras</h2>
+            <h2>🧾 Mis Compras</h2>
 
             {% if compras %}
                 <ul>
                     {% for compra in compras %}
                         <li class="factura-item">
                             <div>
-                                <strong>Producto:</strong> {{ compra.habitacion.numero }} |
-                                <strong>Precio:</strong> ${{ compra.habitacion.precio_por_noche|floatformat:2 }} |
-                                <strong>Fecha:</strong> {{ compra.fecha_inicio }}
+                                <strong>Producto:</strong> {{ compra.producto.nombre }} |
+                                <strong>Categoría:</strong> {{ compra.producto.categoria }} |
+                                <strong>Cantidad:</strong> {{ compra.cantidad }} |
+                                <strong>Fecha:</strong> {{ compra.fecha_compra|date:"d/m/Y H:i" }}
                             </div>
-                            {% if not compra.pagada %}
-                            <form action="{% url 'pagar_compra' compra.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn-small">Pagar</button>
-                            </form>
-                            {% else %}
-                                <span style="color: green; font-weight: 600;">Pagada</span>
-                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
-
-                <div class="paginacion">
-                    {% if compras.has_previous %}
-                        <a href="?page={{ compras.previous_page_number }}">Anterior</a>
-                    {% endif %}
-                    <span>Página {{ compras.number }} de {{ compras.paginator.num_pages }}</span>
-                    {% if compras.has_next %}
-                        <a href="?page={{ compras.next_page_number }}">Siguiente</a>
-                    {% endif %}
-                </div>
             {% else %}
-                <p>No se encontraron compras.</p>
+                <p>No has realizado compras todavía.</p>
             {% endif %}
 
             <a href="{% url 'dashboard' %}" class="boton-volver">← Volver al Dashboard</a>

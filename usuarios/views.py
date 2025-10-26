@@ -448,3 +448,45 @@ def pagar_factura(request, factura_id):
     factura.save()
     messages.success(request, "Factura pagada correctamente.")
     return redirect('visualizar_facturas')
+
+
+@login_required
+def gestionar_inventario(request):
+    # Obtener parámetros de búsqueda y filtrado
+    search_query = request.GET.get('search', '')
+    categoria_filter = request.GET.get('categoria', '')
+    
+    # Consultar productos
+    productos = Producto.objects.all()
+    
+    # Aplicar búsqueda
+    if search_query:
+        productos = productos.filter(
+            models.Q(nombre__icontains=search_query) |
+            models.Q(codigo__icontains=search_query)
+        )
+    
+    # Aplicar filtro por categoría
+    if categoria_filter:
+        productos = productos.filter(categoria=categoria_filter)
+    
+    # Obtener categorías únicas para el filtro
+    categorias = Producto.objects.values_list('categoria', flat=True).distinct()
+    
+    # Determinar el estado del stock
+    for producto in productos:
+        if producto.stock == 0:
+            producto.estado = 'empty'
+        elif producto.stock < 10:  # Puedes ajustar este valor según tus necesidades
+            producto.estado = 'low'
+        else:
+            producto.estado = 'ok'
+    
+    context = {
+        'productos': productos,
+        'categorias': categorias,
+        'search_query': search_query,
+        'categoria_selected': categoria_filter
+    }
+    
+    return render(request, 'inventario.html', context)

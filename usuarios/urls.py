@@ -12,7 +12,7 @@ urlpatterns = [
     
     # Acceso desde dashboard
     path('productos/', views.listar_productos, name='productos'),
-    path('inventario/', views.gestionar_reservas, name='inventario'),   # ajustar si necesitas otra vista
+    path('inventario/', views.gestionar_inventario, name='inventario'),   # ajustar si necesitas otra vista
     path('compras/', views.gestionar_compras, name='compras'),       # ajustar si necesitas otra vista
     path('comprar_producto/<int:producto_id>/', views.comprar_producto, name='comprar_producto'),
     path('compras/pagar/<int:compra_id>/', views.pagar_compra, name='pagar_compra'),
@@ -29,4 +29,4 @@ urlpatterns = [
 
 
 
-] 
+]

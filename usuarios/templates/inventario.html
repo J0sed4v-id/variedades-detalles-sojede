@@ -1,0 +1,99 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manejo de inventario - Papelería</title>
+    <link rel="stylesheet" href="{% static 'inventario.css' %}">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header-sojede">
+        <div class="header-left">
+            <img src="{% static 'images/logo.jpg' %}" alt="Logo Papelería">
+            <nav class="nav-sojede">
+                <a href="{% url 'dashboard' %}">Inicio</a>
+                <a href="{% url 'productos' %}">Productos</a>
+                <a href="{% url 'inventario' %}" class="active">Inventario</a>
+                <a href="{% url 'compras' %}">Compras</a>
+            </nav>
+        </div>
+        <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
+    </header>
+
+    <!-- Main -->
+    <main class="main-sojede">
+        <h2 class="title-sojede">Manejo de inventario</h2>
+
+        <!-- Barra de búsqueda -->
+        <form method="GET" class="search-bar">
+            <div class="search-input">
+                <img src="{% static 'images/lupa.png' %}" alt="Buscar" class="icon-search">
+                <input type="text" name="search" placeholder="Buscar productos" value="{{ search_query }}">
+                {% if search_query %}
+                    <button type="button" class="btn-clear" onclick="window.location.href='{% url 'inventario' %}'">✕</button>
+                {% endif %}
+            </div>
+
+            <div class="filter-box">
+                <select name="categoria" class="btn-filter" onchange="this.form.submit()">
+                    <option value="">Todas las categorías</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria }}" {% if categoria == categoria_selected %}selected{% endif %}>
+                            {{ categoria }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        <hr class="divider">
+
+        <!-- Tabla de inventario -->
+        <table class="inventory-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.codigo }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.categoria }}</td>
+                    <td>{{ producto.stock }}</td>
+                    <td class="status-{{ producto.estado }}">
+                        {% if producto.estado == 'empty' %}
+                            Sin stock
+                        {% elif producto.estado == 'low' %}
+                            Bajo stock
+                        {% else %}
+                            Suficiente
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No se encontraron productos</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-sojede">
+        <p>© 2025 — Sistema de Gestión de Inventario y Facturación.</p>
+        <p>soporte.sojede@gmail.com</p>
+    </footer>
+
+</body>
+</html>

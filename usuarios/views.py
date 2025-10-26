@@ -14,7 +14,8 @@ from .models import Habitacion, Reserva, Cliente, Factura
 from .forms import ReservaForm
 from django.db import IntegrityError
 from django.views.decorators.http import require_POST
-from .models import Producto
+from .models import Habitacion, Reserva, Cliente, Factura, Producto, Compra
+
 
 # Vista para el dashboard (requiere que el usuario esté autenticado)
 @login_required(login_url='iniciar_sesion')
@@ -212,42 +213,47 @@ def eliminar_producto(request, producto_id):
 
 #//////////////////////////////////////////////////////////////////////////////////////////
 
-
-#vista para gestionar compras (visualizar productos y historial de compras)
+# Vista para gestionar compras (visualizar productos y registrar historial)
 @login_required
 def gestionar_compras(request):
     usuario = request.user
     cliente, _ = Cliente.objects.get_or_create(usuario=usuario)
-    
-    # Productos disponibles
-    productos = Habitacion.objects.filter(disponible=True)
-    
-    # Historial de compras del cliente
-    compras = Reserva.objects.filter(cliente=cliente).order_by('-id')
-    paginator = Paginator(compras, 10)
-    page_number = request.GET.get('page')
-    compras_paginadas = paginator.get_page(page_number)
-    
+
+    # ✅ Mostrar productos con stock disponible
+    productos = Producto.objects.filter(stock__gt=0).order_by('nombre')
+
+    # 🧾 Historial de compras del cliente
+    compras = Compra.objects.filter(cliente=cliente).order_by('-fecha_compra')
+
+    # 🛒 Manejo de compra
     if request.method == 'POST':
         producto_id = request.POST.get('producto_id')
-        producto = Habitacion.objects.get(id=producto_id)
-        
-        # Crear una "compra" usando Reserva como base
-        compra = Reserva.objects.create(
+        producto = get_object_or_404(Producto, id=producto_id)
+
+        if producto.stock <= 0:
+            messages.error(request, f"❌ El producto '{producto.nombre}' está agotado.")
+            return redirect('compras')
+
+        # Reducir stock
+        producto.stock -= 1
+        producto.save()
+
+        # Registrar la compra
+        Compra.objects.create(
             cliente=cliente,
-            habitacion=producto,
-            fecha_inicio=date.today(),
-            fecha_fin=date.today(),  # se puede ajustar según la lógica de la compra
-            estado_reserva='comprada'  # nuevo estado para compras
+            producto=producto,
+            cantidad=1
         )
-        
-        messages.success(request, f'Has comprado el producto {producto.numero} correctamente.')
+
+        messages.success(request, f"✅ Has comprado '{producto.nombre}'. Stock restante: {producto.stock}.")
         return redirect('compras')
-    
+
+    # 🔁 Renderizar plantilla
     return render(request, 'usuarios/compras.html', {
         'productos': productos,
-        'compras': compras_paginadas
+        'compras': compras
     })
+
 
 
 # Vista para pagar una compra
@@ -264,19 +270,25 @@ def pagar_compra(request, compra_id):
 def comprar_producto(request, producto_id):
     usuario = request.user
     cliente, _ = Cliente.objects.get_or_create(usuario=usuario)
-    producto = get_object_or_404(Habitacion, id=producto_id)
+    producto = get_object_or_404(Producto, id=producto_id)
 
-    # Crear la compra (usaremos Reserva como compra temporal)
-    reserva = Reserva.objects.create(
-        cliente=cliente,
-        habitacion=producto,
-        fecha_inicio=timezone.now(),
-        fecha_fin=timezone.now(),  # opcional, si no hay fecha de salida
-        estado_reserva='reservada'  # temporal, podemos usarlo como 'pendiente pago'
-    )
+    # Verificar que haya stock disponible
+    if producto.stock <= 0:
+        messages.error(request, f"❌ El producto '{producto.nombre}' no tiene stock disponible.")
+        return redirect('compras')
 
-    messages.success(request, f'Has comprado el producto {producto.numero} correctamente.')
+    # Cantidad comprada (por ahora asumimos 1 unidad)
+    cantidad = 1
+
+    # Restar del inventario
+    producto.stock -= cantidad
+    producto.save()
+
+    # Mostrar mensaje de confirmación
+    messages.success(request, f"✅ Has comprado '{producto.nombre}'. Stock restante: {producto.stock}.")
+
     return redirect('compras')
+
 
 
 

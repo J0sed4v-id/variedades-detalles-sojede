@@ -36,7 +36,8 @@ class Compra(models.Model):
     cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
     producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField(default=1)
-    fecha_compra = models.DateTimeField(auto_now_add=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    fecha_compra = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"Compra de {self.producto.nombre} por {self.cliente.nombre_cliente} ({self.cantidad})"

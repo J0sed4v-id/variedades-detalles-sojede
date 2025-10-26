@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compras - Sojede</title>
     <link rel="stylesheet" type="text/css" href="{% static 'compras.css' %}">
+
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
     <!-- ===== HEADER ===== -->
@@ -24,62 +27,79 @@
 
     <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="main-sojede">
-        <!-- Lista de productos disponibles -->
-        <div class="facturas-container">
-            <h2>🛒 Productos disponibles</h2>
+        <section class="compras-container">
 
-            {% if productos %}
-                <ul>
-                    {% for producto in productos %}
-                        <li class="factura-item">
-                            <div>
-                                <strong>Nombre:</strong> {{ producto.nombre }} |
-                                <strong>Categoría:</strong> {{ producto.categoria }} |
-                                <strong>Código:</strong> {{ producto.codigo }} |
-                                <strong>Stock:</strong> {{ producto.stock }}
-                            </div>
+            <!-- ===== FORMULARIO DE AÑADIR COMPRA ===== -->
+            <h2>➕ Añadir compra</h2>
+            <form method="post" action="{% url 'compras' %}" class="form-compras">
+                {% csrf_token %}
 
-                            {% if producto.stock > 0 %}
-                                <!-- ✅ Formulario corregido -->
-                            <form action="{% url 'compras' %}" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                                <button type="submit" class="btn-small">Comprar</button>
-                            </form>
-                            {% else %}
-                                <span style="color: red; font-weight: bold;">Agotado</span>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No hay productos disponibles.</p>
-            {% endif %}
-        </div>
+                <div class="form-row">
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha" name="fecha_compra" required>
 
-        <!-- Historial de compras -->
-        <div class="facturas-container">
-            <h2>🧾 Mis Compras</h2>
+                    <label for="producto">Producto:</label>
+                    <select id="producto" name="producto_id" required></select>
 
-            {% if compras %}
-                <ul>
-                    {% for compra in compras %}
-                        <li class="factura-item">
-                            <div>
-                                <strong>Producto:</strong> {{ compra.producto.nombre }} |
-                                <strong>Categoría:</strong> {{ compra.producto.categoria }} |
-                                <strong>Cantidad:</strong> {{ compra.cantidad }} |
-                                <strong>Fecha:</strong> {{ compra.fecha_compra|date:"d/m/Y H:i" }}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No has realizado compras todavía.</p>
-            {% endif %}
+                    <label for="total">Total:</label>
+                    <input type="number" id="total" name="total" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="cantidad">Cantidad:</label>
+                    <input type="number" id="cantidad" name="cantidad" min="1" step="1" value="1" required>
+
+                    <label for="categoria">Categoría:</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Seleccione</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria }}">{{ categoria }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="btn-guardar">💾 Guardar Compra</button>
+                </div>
+            </form>
+
+            <hr>
+
+            <!-- ===== BUSCADOR ===== -->
+            <div class="buscador-compras">
+                <input type="text" id="buscar-fecha" placeholder="🔍 Buscar compras por fecha...">
+            </div>
+
+            <!-- ===== TABLA DE COMPRAS ===== -->
+            <table class="tabla-compras">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if compras %}
+                        {% for compra in compras %}
+                            <tr>
+                                <td>{{ compra.fecha_compra|date:"d/m/Y" }}</td>
+                                <td>{{ compra.producto.nombre }}</td>
+                                <td>{{ compra.producto.categoria }}</td>
+                                <td>{{ compra.cantidad }}</td>
+                                <td>${{ compra.total|floatformat:2 }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align:center;">No hay compras registradas.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
 
             <a href="{% url 'dashboard' %}" class="boton-volver">← Volver al Dashboard</a>
-        </div>
+        </section>
     </main>
 
     <!-- ===== FOOTER ===== -->
@@ -87,5 +107,41 @@
         <p>© 2025 Variedades y Detalles Sojede — Todos los derechos reservados</p>
         <p>soporte.sojede@gmail.com</p>
     </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        // Inicializar Select2 en campo producto
+        $('#producto').select2({
+          placeholder: "Buscar producto...",
+          allowClear: true,
+          ajax: {
+            url: "{% url 'buscar_productos' %}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return { q: params.term };
+            },
+            processResults: function (data) {
+              return { results: data.results };
+            },
+            cache: true
+          },
+          minimumInputLength: 1,
+          width: '200px'
+        });
+
+        // Buscador por fecha (filtro rápido en tabla)
+        $('#buscar-fecha').on('keyup', function() {
+          var valor = $(this).val().toLowerCase();
+          $('.tabla-compras tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(valor) > -1)
+          });
+        });
+      });
+    </script>
 </body>
 </html>

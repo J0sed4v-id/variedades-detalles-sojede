@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 from .forms import CustomUserCreationForm, BuscarHabitacionForm, HabitacionForm
 from .models import Habitacion, Reserva, Cliente, Factura
 from .forms import ReservaForm
@@ -213,46 +214,51 @@ def eliminar_producto(request, producto_id):
 
 #//////////////////////////////////////////////////////////////////////////////////////////
 
-# Vista para gestionar compras (visualizar productos y registrar historial)
+# Vista para gestionar compras con formulario moderno
 @login_required
 def gestionar_compras(request):
     usuario = request.user
     cliente, _ = Cliente.objects.get_or_create(usuario=usuario)
 
-    # ✅ Mostrar productos con stock disponible
-    productos = Producto.objects.filter(stock__gt=0).order_by('nombre')
+    # 🔸 Categorías únicas para el select
+    categorias = Producto.objects.values_list('categoria', flat=True).distinct()
 
     # 🧾 Historial de compras del cliente
-    compras = Compra.objects.filter(cliente=cliente).order_by('-fecha_compra')
+    compras = Compra.objects.filter(cliente=cliente).select_related('producto').order_by('-fecha_compra')
 
-    # 🛒 Manejo de compra
+    # 🛒 Registrar nueva compra
     if request.method == 'POST':
         producto_id = request.POST.get('producto_id')
+        cantidad = int(request.POST.get('cantidad'))
+        total = request.POST.get('total')
+
         producto = get_object_or_404(Producto, id=producto_id)
 
-        if producto.stock <= 0:
-            messages.error(request, f"❌ El producto '{producto.nombre}' está agotado.")
+        if producto.stock < cantidad:
+            messages.error(request, f"❌ Stock insuficiente para '{producto.nombre}'.")
             return redirect('compras')
 
-        # Reducir stock
-        producto.stock -= 1
+        # Actualizar stock
+        producto.stock -= cantidad
         producto.save()
 
-        # Registrar la compra
+        # Crear compra
         Compra.objects.create(
             cliente=cliente,
             producto=producto,
-            cantidad=1
+            cantidad=cantidad,
+            total=total
         )
 
-        messages.success(request, f"✅ Has comprado '{producto.nombre}'. Stock restante: {producto.stock}.")
+        messages.success(request, f"✅ Compra registrada: {cantidad} x '{producto.nombre}'.")
         return redirect('compras')
 
-    # 🔁 Renderizar plantilla
+    # 🔁 Renderizar plantilla con datos
     return render(request, 'usuarios/compras.html', {
-        'productos': productos,
+        'categorias': categorias,
         'compras': compras
     })
+
 
 
 
@@ -502,3 +508,15 @@ def gestionar_inventario(request):
     }
     
     return render(request, 'inventario.html', context)
+
+
+@login_required
+def buscar_productos(request):
+    """Devuelve productos que coinciden con la búsqueda (para el autocompletado)."""
+    termino = request.GET.get("q", "")
+    resultados = (
+        Producto.objects.filter(nombre__icontains=termino)
+        .order_by("nombre")[:10]
+    )
+    data = [{"id": p.id, "text": f"{p.nombre} — Stock: {p.stock}"} for p in resultados]
+    return JsonResponse({"results": data})

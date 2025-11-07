@@ -30,10 +30,7 @@ class Producto(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.codigo})"
 
-
-
-
-
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Modelo Habitacion
 class Habitacion(models.Model): 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -51,7 +48,7 @@ class Habitacion(models.Model):
 
     def __str__(self):
         return f"Habitación {self.numero} - {self.tipo}"
-
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Modelo Cliente
 class Cliente(models.Model):
     nombre_cliente = models.CharField(max_length=100)
@@ -61,7 +58,7 @@ class Cliente(models.Model):
 
     def __str__(self):
         return self.nombre_cliente
-
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Modelo Empleado
 class Empleado(models.Model):
     nombre_empleado = models.CharField(max_length=100)
@@ -71,7 +68,7 @@ class Empleado(models.Model):
 
     def __str__(self):
         return self.nombre_empleado
-
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Modelo Reserva
 class Reserva(models.Model):
     # Definimos los estados posibles de la reserva
@@ -90,7 +87,7 @@ class Reserva(models.Model):
     def __str__(self):
         return f"Reserva {self.id} - {self.estado_reserva}"
 
-
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Modelo Reporte
 class Reporte(models.Model):
     fecha_generacion = models.DateField()
@@ -99,7 +96,7 @@ class Reporte(models.Model):
 
     def __str__(self):
         return f"Reporte {self.id} - {self.tipo_reporte}"
-    
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////    
 #Modelo factura
 class Factura(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)

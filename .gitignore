@@ -1,0 +1,36 @@
+# ==== Entornos virtuales ====
+venv/
+env/
+.venv/
+.env/
+*.env
+
+# ==== Archivos de configuración y claves ====
+.env
+*.env
+secret_key.txt
+
+# ==== Archivos de base de datos ====
+db.sqlite3
+
+# ==== Archivos compilados de Python ====
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ==== Archivos estáticos generados ====
+/staticfiles/
+/media/
+
+# ==== Archivos de logs ====
+*.log
+
+# ==== Archivos de IDEs ====
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ==== Archivos de sistema ====
+.DS_Store
+Thumbs.db

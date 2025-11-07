@@ -15,18 +15,18 @@ from .models import Habitacion, Reserva, Cliente, Factura
 from .forms import ReservaForm
 from django.db import IntegrityError
 from django.views.decorators.http import require_POST
-from .models import Habitacion, Reserva, Cliente, Factura, Producto, Compra
-
+from .models import Producto
+from django.db.models import Q
 
 # Vista para el dashboard (requiere que el usuario esté autenticado)
 @login_required(login_url='iniciar_sesion')
 def dashboard(request):
     return render(request, 'usuarios/dashboard.html')
-
+#/////////////////////////////////////////////////////////////////////////////////////////////////
 # Vista para la página de inicio
 def inicio(request):
     return render(request, 'usuarios/inicio.html')
-
+#/////////////////////////////////////////////////////////////////////////////////////////////////
 # Vista para el registro de usuarios
 def registrar(request):
     if request.method == 'POST':
@@ -40,7 +40,7 @@ def registrar(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'usuarios/registro.html', {'form': form})
-
+#/////////////////////////////////////////////////////////////////////////////////////////////////
 # Vista para iniciar sesión
 def iniciar_sesion(request):
     if request.method == 'POST':
@@ -54,13 +54,15 @@ def iniciar_sesion(request):
         else:
             messages.error(request, "Nombre de usuario o contraseña incorrectos.")
     return render(request, 'usuarios/inicio.html')
-
+#/////////////////////////////////////////////////////////////////////////////////////////////////
 # Vista para cerrar sesión
 def cerrar_sesion(request):
     logout(request)
     messages.success(request, "Sesión cerrada exitosamente.")
     return redirect('inicio')
 
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////
 # Vista para buscar habitaciones disponibles
 def buscar_habitaciones(request):
     form = BuscarHabitacionForm(request.POST or None)
@@ -84,10 +86,7 @@ def buscar_habitaciones(request):
         'form': form,
         'habitaciones_disponibles': habitaciones_disponibles
     })
-
-
-
-
+#/////////////////////////////////////////////////////////////////////////////////////////////////
 # Vista para crear una nueva habitación
 @login_required
 def crear_habitacion(request):
@@ -102,7 +101,7 @@ def crear_habitacion(request):
     else:
         form = HabitacionForm()
     return render(request, 'usuarios/crear_habitacion.html', {'form': form})
-
+#/////////////////////////////////////////////////////////////////////////////////////////////////
 # Vista para actualizar los detalles de una habitación
 @login_required
 def actualizar_habitacion(request, id):
@@ -117,7 +116,7 @@ def actualizar_habitacion(request, id):
         form = HabitacionForm(instance=habitacion)
     return render(request, 'usuarios/actualizar_habitacion.html', {'form': form})
 
-
+#/////////////////////////////////////////////////////////////////////////////////////////////////
 # Vista para eliminar una habitación
 def eliminar_habitacion(request, id):
     habitacion = get_object_or_404(Habitacion, id=id)
@@ -125,6 +124,9 @@ def eliminar_habitacion(request, id):
     # Eliminar la habitación
     habitacion.delete()
     return redirect('visualizar_habitaciones')
+
+
+
 
 
 
@@ -157,8 +159,21 @@ def gestionar_productos(request):
 
 @login_required
 def listar_productos(request):
+    query = request.GET.get('q')
     productos = Producto.objects.all()
-    return render(request, 'usuarios/productos.html', {'productos': productos})
+
+    if query:
+        productos = productos.filter(
+            Q(codigo__icontains=query) |
+            Q(nombre__icontains=query) |
+            Q(categoria__icontains=query) |
+            Q(id__icontains=query)
+        )
+
+    return render(request, 'usuarios/productos.html', {
+        'productos': productos,
+        'query': query
+    })
 
 #//////////////////////////////////////////////////////////////////////////////////////
 @login_required
@@ -294,6 +309,21 @@ def comprar_producto(request, producto_id):
     messages.success(request, f"✅ Has comprado '{producto.nombre}'. Stock restante: {producto.stock}.")
 
     return redirect('compras')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -73,7 +73,7 @@
             </thead>
             <tbody>
                 {% for producto in productos %}
-                <tr>
+               <tr {% if request.GET.q and request.GET.q|lower in producto.nombre|lower or request.GET.q|lower in producto.codigo|lower or request.GET.q|lower in producto.categoria|lower %}style="background-color: #d7f0ff;"{% endif %}>
                     <td>{{ producto.codigo }}</td>
                     <td>{{ producto.nombre }}</td>
                     <td>{{ producto.stock }}</td>

@@ -11,12 +11,13 @@ from django.utils import timezone
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from .forms import CustomUserCreationForm, BuscarHabitacionForm, HabitacionForm
-from .models import Habitacion, Reserva, Cliente, Factura
+from .models import Habitacion, Reserva, Cliente, Factura, Compra
 from .forms import ReservaForm
 from django.db import IntegrityError
 from django.views.decorators.http import require_POST
-from .models import Producto
-from django.db.models import Q
+from .models import Producto, Venta, DetalleVenta
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 # Vista para el dashboard (requiere que el usuario esté autenticado)
 @login_required(login_url='iniciar_sesion')
@@ -538,6 +539,88 @@ def gestionar_inventario(request):
     }
     
     return render(request, 'usuarios/inventario.html', context)
+
+
+@login_required
+def registrar_venta(request):
+    return render(request, 'usuarios/registrar_venta.html')
+
+@login_required
+def buscar_producto_por_codigo(request):
+    codigo = request.GET.get('codigo', None)
+    data = {'error': 'Producto no encontrado.'}
+    if codigo:
+        try:
+            producto = Producto.objects.get(codigo=codigo)
+            data = {
+                'id': producto.id,
+                'nombre': producto.nombre,
+                'precio': producto.precio,
+                'stock': producto.stock,
+                'codigo': producto.codigo
+            }
+        except Producto.DoesNotExist:
+            pass
+    return JsonResponse(data)
+
+@login_required
+def guardar_venta(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            productos = data.get('productos', [])
+            totales = data.get('totales', {})
+
+            # Crear la venta
+            venta = Venta.objects.create(
+                subtotal=totales.get('subtotal'),
+                iva=totales.get('iva'),
+                total=totales.get('total')
+            )
+
+            # Crear los detalles y actualizar stock
+            for item in productos:
+                producto = get_object_or_404(Producto, id=item['id'])
+                cantidad = int(item['cantidad'])
+                
+                DetalleVenta.objects.create(
+                    venta=venta,
+                    producto=producto,
+                    cantidad=cantidad,
+                    precio_unitario=item['precio'],
+                    subtotal=item['subtotal']
+                )
+                
+                # Actualizar stock
+                producto.stock -= cantidad
+                producto.save()
+
+            return JsonResponse({'status': 'success', 'venta_id': venta.id})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+@login_required
+def listar_todos_los_productos_api(request):
+    """Devuelve una lista de todos los productos para el modal de búsqueda."""
+    productos = Producto.objects.all().values('id', 'codigo', 'nombre', 'precio', 'stock')
+    return JsonResponse(list(productos), safe=False)
+
+
+@login_required
+def get_product_details(request, producto_id):
+    """Devuelve el precio, stock y categoría de un producto en formato JSON."""
+    try:
+        producto = get_object_or_404(Producto, id=producto_id)
+        data = {
+            'precio': producto.precio,
+            'stock': producto.stock,
+            'categoria': producto.categoria,
+        }
+        return JsonResponse(data)
+    except Producto.DoesNotExist:
+        return JsonResponse({'error': 'Producto no encontrado'}, status=404)
 
 
 @login_required

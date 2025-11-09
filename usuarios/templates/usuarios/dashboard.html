@@ -18,6 +18,7 @@
                 <a href="{% url 'productos' %}">Productos</a>
                 <a href="{% url 'inventario' %}">Inventario</a>
                 <a href="{% url 'compras' %}">Compras</a>
+                <a href="{% url 'facturas_placeholder' %}">Facturas</a>
             </nav>
         </div>
         <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
@@ -47,9 +48,9 @@
             <!-- Compras -->
             <div class="dashboard-card">
                 <img src="{% static 'images/compras.png' %}" alt="Compras">
-                <h3>Compras</h3>
-                <p>Ingresa las compras realizadas</p>
-                <a href="{% url 'compras' %}" class="btn-sojede">Ir a registrar compras</a>
+                <h3>Registrar Venta</h3>
+                <p>Registra nuevas ventas y gestiona el punto de venta.</p>
+                <a href="{% url 'compras' %}" class="btn-sojede">Ir a registrar venta</a>
             </div>
 
             <!-- Facturas -->

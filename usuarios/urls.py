@@ -11,7 +11,14 @@ urlpatterns = [
     # Acceso desde dashboard
     path('productos/', views.listar_productos, name='productos'),
     path('inventario/', views.gestionar_inventario, name='inventario'),
-    path('compras/', views.gestionar_compras, name='compras'),
+    
+    # La URL 'compras' ahora apunta a la vista de registrar venta (TPV)
+    path('compras/', views.registrar_venta, name='compras'),
+    
+    # Dejamos 'facturas' como un placeholder para el futuro
+    path('facturas/', views.dashboard, name='facturas_placeholder'),
+
+    # La vieja funcionalidad de compras ya no se usa en la URL principal
     path('comprar_producto/<int:producto_id>/', views.comprar_producto, name='comprar_producto'),
     path('compras/pagar/<int:compra_id>/', views.pagar_compra, name='pagar_compra'),
 
@@ -21,4 +28,11 @@ urlpatterns = [
 
     # Nueva ruta para autocompletado
     path('buscar_productos/', views.buscar_productos, name='buscar_productos'),
+    path('productos/buscar/', views.buscar_productos, name='buscar_productos'),
+
+    # Las APIs para la venta se mantienen igual
+    path('api/buscar_producto/', views.buscar_producto_por_codigo, name='buscar_producto_codigo'),
+    path('api/guardar_venta/', views.guardar_venta, name='guardar_venta'),
+    path('api/listar_productos/', views.listar_todos_los_productos_api, name='listar_productos_api'),  # <-- AÑADIR ESTA LÍNEA
+    path('productos/<int:producto_id>/details/', views.get_product_details, name='get_product_details'),
 ]

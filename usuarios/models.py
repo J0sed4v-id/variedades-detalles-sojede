@@ -18,9 +18,18 @@ METODO_PAGO_CHOICES = [
     ('efectivo', 'Efectivo'),
 ]
 
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
+# Modelo Cliente
+class Cliente(models.Model):
+    nombre_cliente = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=20)
+    direccion = models.CharField(max_length=255)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.nombre_cliente
 
 #Modelo productos
-
 class Producto(models.Model):
     codigo = models.CharField(max_length=20, unique=True)
     nombre = models.CharField(max_length=100)
@@ -30,7 +39,27 @@ class Producto(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.codigo})"
-    
+
+class Venta(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+    iva = models.DecimalField(max_digits=10, decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Venta #{self.id} - {self.fecha.strftime('%Y-%m-%d')}"
+
+class DetalleVenta(models.Model):
+    venta = models.ForeignKey(Venta, related_name='detalles', on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.cantidad} x {self.producto.nombre}"
+
 
 # Modelo para registrar las compras
 class Compra(models.Model):
@@ -62,16 +91,6 @@ class Habitacion(models.Model):
 
     def __str__(self):
         return f"Habitación {self.numero} - {self.tipo}"
-#//////////////////////////////////////////////////////////////////////////////////////////////////////////
-# Modelo Cliente
-class Cliente(models.Model):
-    nombre_cliente = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=20)
-    direccion = models.CharField(max_length=255)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.nombre_cliente
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 # Modelo Empleado
 class Empleado(models.Model):

@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Venta - Sojede</title>
+    <link rel="stylesheet" href="{% static 'compras.css' %}"> <!-- Reutilizamos header/footer -->
+    <link rel="stylesheet" href="{% static 'facturas.css' %}">
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header class="header-sojede">
+        <div class="header-left">
+            <img src="{% static 'images/logo.jpg' %}" alt="Logo Sojede">
+            <nav class="nav-sojede">
+                <a href="{% url 'dashboard' %}">Inicio</a>
+                <a href="{% url 'productos' %}">Productos</a>
+                <a href="{% url 'inventario' %}">Inventario</a>
+                <a href="{% url 'compras' %}">Compras</a>
+                <a href="{% url 'facturas_placeholder' %}" class="active">Facturas</a>
+                <a href="#">Informes</a>
+            </nav>
+        </div>
+        <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
+    </header>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="main-container">
+        <!-- Panel Izquierdo: Formulario y Tabla -->
+        <div class="left-panel">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Registrar Venta</h2>
+                    <button class="btn btn-primary" id="btn-nueva-venta">Nueva Venta</button>
+                </div>
+                <hr>
+                <!-- Formulario para añadir productos -->
+                <div class="product-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="prod-codigo">Producto</label>
+                            <input type="text" id="prod-codigo" placeholder="2700">
+                        </div>
+                        <div class="form-group">
+                            <label for="prod-cantidad">Cantidad</label>
+                            <input type="number" id="prod-cantidad" value="1" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="prod-precio">Precio Unitario</label>
+                            <input type="text" id="prod-precio" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="prod-subtotal">SubTotal</label>
+                            <input type="text" id="prod-subtotal" readonly>
+                        </div>
+                        <div class="form-group description-field">
+                            <label>Descripción del producto</label>
+                            <input type="text" id="prod-descripcion" readonly>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <a href="#" id="btn-agregar-producto" class="add-product-btn"><span class="plus-icon">+</span> Agregar Producto</a>
+                        <button class="btn btn-secondary" id="btn-limpiar-campos">Limpiar Campos</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 20px;">
+                <h3>Descripción de la venta</h3>
+                <table class="sale-details-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="sale-items-body">
+                        <!-- Filas de productos se añadirán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Totales y Acciones -->
+        <div class="right-panel">
+            <div class="card">
+                <div class="totals-summary">
+                    <div class="total-row">
+                        <span>SubTotal</span>
+                        <span id="summary-subtotal">$ 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>IVA (19%)</span>
+                        <span id="summary-iva">$ 0.00</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Total</span>
+                        <span id="summary-total">$ 0.00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="actions-panel">
+                <button class="btn btn-primary" id="btn-guardar-venta">Guardar Venta</button>
+                <button class="btn btn-secondary" id="btn-generar-pdf">Generar Factura PDF</button>
+                <button class="btn btn-danger" id="btn-eliminar-venta">Eliminar Venta</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const IVA_RATE = 0.19;
+        let ventaItems = [];
+        let currentProduct = null;
+
+        // Elementos del DOM
+        const codigoInput = document.getElementById('prod-codigo');
+        const cantidadInput = document.getElementById('prod-cantidad');
+        const precioInput = document.getElementById('prod-precio');
+        const subtotalInput = document.getElementById('prod-subtotal');
+        const descripcionInput = document.getElementById('prod-descripcion');
+        const saleItemsBody = document.getElementById('sale-items-body');
+
+        // --- FUNCIONES ---
+        const formatCurrency = (value) => `$ ${parseFloat(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+
+        const limpiarCamposProducto = () => {
+            codigoInput.value = '';
+            cantidadInput.value = '1';
+            precioInput.value = '';
+            subtotalInput.value = '';
+            descripcionInput.value = '';
+            currentProduct = null;
+            codigoInput.focus();
+        };
+
+        const actualizarTotales = () => {
+            const subtotal = ventaItems.reduce((sum, item) => sum + item.subtotal, 0);
+            const iva = subtotal * IVA_RATE;
+            const total = subtotal + iva;
+
+            document.getElementById('summary-subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('summary-iva').textContent = formatCurrency(iva);
+            document.getElementById('summary-total').textContent = formatCurrency(total);
+        };
+
+        const renderizarTabla = () => {
+            saleItemsBody.innerHTML = '';
+            ventaItems.forEach((item, index) => {
+                const row = `
+                    <tr>
+                        <td>${item.codigo}</td>
+                        <td>${item.nombre}</td>
+                        <td>${item.cantidad}</td>
+                        <td>${formatCurrency(item.precio)}</td>
+                        <td>${formatCurrency(item.subtotal)}</td>
+                        <td class="action-cell"><span class="delete-item" data-index="${index}">X</span></td>
+                    </tr>`;
+                saleItemsBody.innerHTML += row;
+            });
+            actualizarTotales();
+        };
+        
+        const nuevaVenta = () => {
+            ventaItems = [];
+            renderizarTabla();
+            limpiarCamposProducto();
+            alert('Nueva venta iniciada.');
+        };
+
+        // --- EVENTOS ---
+        codigoInput.addEventListener('change', async () => {
+            const codigo = codigoInput.value;
+            if (!codigo) return;
+
+            const response = await fetch(`{% url 'buscar_producto_codigo' %}?codigo=${codigo}`);
+            const data = await response.json();
+
+            if (data.error) {
+                alert(data.error);
+                limpiarCamposProducto();
+            } else {
+                currentProduct = data;
+                descripcionInput.value = `cod - ${data.codigo}    ${data.nombre}`;
+                precioInput.value = data.precio;
+                cantidadInput.value = 1;
+                cantidadInput.dispatchEvent(new Event('input'));
+            }
+        });
+
+        cantidadInput.addEventListener('input', () => {
+            if (!currentProduct) return;
+            const cantidad = parseInt(cantidadInput.value) || 0;
+            const precio = parseFloat(precioInput.value) || 0;
+            subtotalInput.value = (cantidad * precio).toFixed(2);
+        });
+
+        document.getElementById('btn-agregar-producto').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!currentProduct || parseInt(cantidadInput.value) <= 0) {
+                alert('Por favor, busca un producto válido y especifica una cantidad.');
+                return;
+            }
+            
+            const cantidad = parseInt(cantidadInput.value);
+            if (cantidad > currentProduct.stock) {
+                alert(`Stock insuficiente. Disponible: ${currentProduct.stock}`);
+                return;
+            }
+
+            const newItem = {
+                id: currentProduct.id,
+                codigo: currentProduct.codigo,
+                nombre: currentProduct.nombre,
+                cantidad: cantidad,
+                precio: parseFloat(currentProduct.precio),
+                subtotal: parseFloat(subtotalInput.value)
+            };
+
+            ventaItems.push(newItem);
+            renderizarTabla();
+            limpiarCamposProducto();
+        });
+
+        document.getElementById('btn-limpiar-campos').addEventListener('click', limpiarCamposProducto);
+        
+        saleItemsBody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-item')) {
+                const index = e.target.dataset.index;
+                ventaItems.splice(index, 1);
+                renderizarTabla();
+            }
+        });
+        
+        document.getElementById('btn-nueva-venta').addEventListener('click', nuevaVenta);
+        document.getElementById('btn-eliminar-venta').addEventListener('click', nuevaVenta);
+
+        document.getElementById('btn-guardar-venta').addEventListener('click', async () => {
+            if (ventaItems.length === 0) {
+                alert('No hay productos en la venta para guardar.');
+                return;
+            }
+
+            const subtotal = ventaItems.reduce((sum, item) => sum + item.subtotal, 0);
+            const iva = subtotal * IVA_RATE;
+            const total = subtotal + iva;
+
+            const payload = {
+                productos: ventaItems,
+                totales: { subtotal: subtotal.toFixed(2), iva: iva.toFixed(2), total: total.toFixed(2) }
+            };
+
+            const response = await fetch(`{% url 'guardar_venta' %}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert(`Venta #${result.venta_id} guardada con éxito.`);
+                nuevaVenta();
+            } else {
+                alert(`Error al guardar la venta: ${result.message}`);
+            }
+        });
+    });
+    </script>
+</body>
+</html>

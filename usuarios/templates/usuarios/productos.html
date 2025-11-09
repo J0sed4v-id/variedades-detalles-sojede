@@ -44,6 +44,9 @@
                     <label for="stock">Stock:</label>
                     <input type="number" name="stock" id="stock" placeholder="00" min="0" required>
 
+                    <label for="precio">Precio:</label>
+                    <input type="number" name="precio" id="precio" placeholder="0.00" min="0" step="0.01" required>
+
                     <label for="categoria">Categoría:</label>
                     <input type="text" name="categoria" id="categoria" placeholder="xxxxxx" required>
 
@@ -67,6 +70,7 @@
                     <th>Código</th>
                     <th>Nombre</th>
                     <th>Stock</th>
+                    <th>Precio</th>
                     <th>Categoría</th>
                     <th>Acciones</th>
                 </tr>
@@ -77,11 +81,12 @@
                     <td>{{ producto.codigo }}</td>
                     <td>{{ producto.nombre }}</td>
                     <td>{{ producto.stock }}</td>
+                    <td>${{ producto.precio|stringformat:".2f" }}</td>
                     <td>{{ producto.categoria }}</td>
                     <td class="actions">
                         <!-- Botón Editar -->
                         <a href="#" class="btn-action" 
-                           onclick="editarProducto('{{ producto.id }}', '{{ producto.codigo }}', '{{ producto.nombre }}', '{{ producto.stock }}', '{{ producto.categoria }}')">✏️</a>
+                           onclick="editarProducto('{{ producto.id }}', '{{ producto.codigo }}', '{{ producto.nombre }}', '{{ producto.stock }}', '{{ producto.precio }}', '{{ producto.categoria }}')">✏️</a>
 
                         <!-- Botón Eliminar -->
                         <a href="{% url 'eliminar_producto' producto.id %}" class="btn-action" 
@@ -90,7 +95,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">No hay productos registrados.</td>
+                    <td colspan="6">No hay productos registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -105,11 +110,12 @@
 
     <!-- Script para rellenar el formulario -->
     <script>
-    function editarProducto(id, codigo, nombre, stock, categoria) {
+    function editarProducto(id, codigo, nombre, stock, precio, categoria) {
         document.getElementById('producto_id').value = id;
         document.getElementById('codigo').value = codigo;
         document.getElementById('nombre').value = nombre;
         document.getElementById('stock').value = stock;
+        document.getElementById('precio').value = precio;
         document.getElementById('categoria').value = categoria;
         document.getElementById('btnGuardar').textContent = 'Actualizar';
     }
@@ -121,6 +127,7 @@
             document.getElementById('codigo').value = '';
             document.getElementById('nombre').value = '';
             document.getElementById('stock').value = '';
+            document.getElementById('precio').value = '';
             document.getElementById('categoria').value = '';
             document.getElementById('btnGuardar').textContent = 'Guardar';
         }, 500);

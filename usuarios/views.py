@@ -127,9 +127,6 @@ def eliminar_habitacion(request, id):
 
 
 
-
-
-
 #/////////////////////////////////////////////////////////////////////////////////////
 
 # Vista para visualizar todas las habitaciones
@@ -183,6 +180,7 @@ def agregar_producto(request):
         codigo = request.POST.get("codigo")
         nombre = request.POST.get("nombre")
         stock = request.POST.get("stock")
+        precio = request.POST.get("precio")
         categoria = request.POST.get("categoria")
 
         if id_producto:  # Editar producto existente
@@ -196,6 +194,7 @@ def agregar_producto(request):
             producto.codigo = codigo
             producto.nombre = nombre
             producto.stock = stock
+            producto.precio = precio
             producto.categoria = categoria
             producto.save()
             messages.success(request, f"✅ Producto '{producto.nombre}' actualizado correctamente.")
@@ -209,6 +208,7 @@ def agregar_producto(request):
                 codigo=codigo,
                 nombre=nombre,
                 stock=stock,
+                precio=precio,
                 categoria=categoria
             )
             messages.success(request, "✅ Producto guardado exitosamente.")
@@ -537,7 +537,7 @@ def gestionar_inventario(request):
         'categoria_selected': categoria_filter
     }
     
-    return render(request, 'inventario.html', context)
+    return render(request, 'usuarios/inventario.html', context)
 
 
 @login_required

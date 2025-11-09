@@ -59,6 +59,7 @@
                     <th>Código</th>
                     <th>Producto</th>
                     <th>Categoría</th>
+                    <th>Precio</th>
                     <th>Stock</th>
                     <th>Estado</th>
                 </tr>
@@ -69,6 +70,7 @@
                     <td>{{ producto.codigo }}</td>
                     <td>{{ producto.nombre }}</td>
                     <td>{{ producto.categoria }}</td>
+                    <td>${{ producto.precio|stringformat:".2f" }}</td>
                     <td>{{ producto.stock }}</td>
                     <td class="status-{{ producto.estado }}">
                         {% if producto.estado == 'empty' %}
@@ -82,7 +84,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center">No se encontraron productos</td>
+                    <td colspan="6" class="text-center">No se encontraron productos</td>
                 </tr>
                 {% endfor %}
             </tbody>

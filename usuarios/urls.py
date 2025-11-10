@@ -33,6 +33,8 @@ urlpatterns = [
     # Las APIs para la venta se mantienen igual
     path('api/buscar_producto/', views.buscar_producto_por_codigo, name='buscar_producto_codigo'),
     path('api/guardar_venta/', views.guardar_venta, name='guardar_venta'),
-    path('api/listar_productos/', views.listar_todos_los_productos_api, name='listar_productos_api'),  # <-- AÑADIR ESTA LÍNEA
-    path('productos/<int:producto_id>/details/', views.get_product_details, name='get_product_details'),
+    path('api/listar_productos/', views.listar_todos_los_productos_api, name='listar_productos_api'),
+
+    # ✅ Nueva ruta para generar la factura PDF térmica
+    path('factura/<int:venta_id>/pdf/', views.generar_factura_pdf, name='generar_factura_pdf'),
 ]

@@ -1,23 +1,28 @@
 from datetime import date
+import json
+
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
-from django.http import HttpResponseBadRequest
-from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
 from django.utils import timezone
 from django.core.paginator import Paginator
-from django.http import JsonResponse
-from .forms import CustomUserCreationForm, BuscarHabitacionForm, HabitacionForm
-from .models import Habitacion, Reserva, Cliente, Factura, Compra
-from .forms import ReservaForm
 from django.db import IntegrityError
-from django.views.decorators.http import require_POST
-from .models import Producto, Venta, DetalleVenta
-import json
-from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Sum
+from django.template.loader import get_template
+
+from .forms import CustomUserCreationForm, BuscarHabitacionForm, HabitacionForm, ReservaForm
+from .models import Habitacion, Reserva, Cliente, Factura, Compra, Producto, Venta, DetalleVenta
+
+from xhtml2pdf import pisa
+import io
+
+
 
 # Vista para el dashboard (requiere que el usuario esté autenticado)
 @login_required(login_url='iniciar_sesion')
@@ -313,6 +318,34 @@ def comprar_producto(request, producto_id):
 
 
 
+@login_required
+def generar_factura_pdf(request, venta_id):
+    """Genera una factura térmica en PDF basada en una venta."""
+    venta = get_object_or_404(Venta, id=venta_id)
+    detalles = DetalleVenta.objects.filter(venta=venta)
+
+    template_path = 'usuarios/factura_venta.html'
+    context = {
+        'venta': venta,
+        'detalles': detalles,
+        'user': request.user
+    }
+
+    # Renderizar el template HTML a PDF
+    template = get_template(template_path)
+    html = template.render(context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="factura_{venta.id}.pdf"'
+
+    # Crear el PDF con xhtml2pdf
+    pisa_status = pisa.CreatePDF(io.BytesIO(html.encode('UTF-8')), dest=response, encoding='UTF-8')
+
+    if pisa_status.err:
+        return HttpResponse('Error al generar el PDF', status=500)
+    return response
+
+
+
 
 
 
@@ -595,10 +628,21 @@ def guardar_venta(request):
                 producto.stock -= cantidad
                 producto.save()
 
-            return JsonResponse({'status': 'success', 'venta_id': venta.id})
+            # ✅ Nueva línea: generar la URL del PDF
+            from django.urls import reverse_lazy
+            pdf_url = reverse_lazy('generar_factura_pdf', args=[venta.id])
+
+            # ✅ Respuesta con URL del PDF incluida
+            return JsonResponse({
+                'status': 'success',
+                'venta_id': venta.id,
+                'pdf_url': str(pdf_url)
+            })
+
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
 
 
 @login_required

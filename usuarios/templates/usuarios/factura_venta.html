@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura de Venta</title>
+    <style>
+        body {
+            font-family: "Courier New", monospace;
+            width: 300px;
+            margin: 0 auto;
+            background: #fff;
+            color: #000;
+        }
+        h2, h3 {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        p {
+            margin: 3px 0;
+            font-size: 14px;
+        }
+        .center {
+            text-align: center;
+        }
+        hr {
+            border: none;
+            border-top: 1px dashed #000;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            text-align: left;
+            padding: 2px 0;
+        }
+        .right {
+            text-align: right;
+        }
+        .totales {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h2>VARIEDADES Y DETALLES</h2>
+    <h3>SOJEDE</h3>
+    <p class="center">Cl 9 #5-74 Local 2 - Yumbo, Valle</p>
+    <p class="center">Teléfono: 3197777183</p>
+    <p class="center">NIT: 67011859 - 0</p>
+    <p>Factura Nro: {{ venta.id }}</p>
+    <p>Fecha: {{ venta.fecha|date:"d/m/Y" }} &nbsp;&nbsp; Hora: {{ venta.fecha|date:"H:i:s" }}</p>
+    <p>Cajero: {{ venta.cajero }} &nbsp;&nbsp;&nbsp; Caja: {{ venta.caja }}</p>
+    <p>Vendedor: {{ venta.vendedor }}</p>
+    <hr>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cant</th>
+                <th>Vlr Uni</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in detalles %}
+            <tr>
+                <td>{{ item.producto.nombre }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td class="right">${{ item.precio_unitario }}</td>
+                <td class="right">${{ item.subtotal }}</td>
+            </tr>
+            <tr>
+                <td colspan="4">Cod corto: {{ item.producto.codigo_corto }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+    <table>
+        <tr>
+            <td>Total</td>
+            <td class="right">${{ venta.subtotal }}</td>
+        </tr>
+        <tr>
+            <td>Descuentos</td>
+            <td class="right">$0,00</td>
+        </tr>
+        <tr>
+            <td>Vlr IVA</td>
+            <td class="right">${{ venta.iva }}</td>
+        </tr>
+    </table>
+    <p class="right"><strong>Neto a Pagar: ${{ venta.total }}</strong></p>
+    <hr>
+
+    <div class="footer">
+        <p>CONTACTO: <a href="mailto:correo@gmail.com">correo@gmail.com</a></p>
+        <p>LÍNEA ATENCIÓN AL CLIENTE: XXXXXXXXXX</p>
+    </div>
+</body>
+</html>

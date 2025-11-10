@@ -354,7 +354,11 @@
 
             const payload = {
                 productos: ventaItems,
-                totales: { subtotal: subtotal.toFixed(2), iva: iva.toFixed(2), total: total.toFixed(2) }
+                totales: { 
+                    subtotal: subtotal.toFixed(2), 
+                    iva: iva.toFixed(2), 
+                    total: total.toFixed(2) 
+                }
             };
 
             try {
@@ -371,14 +375,22 @@
                 
                 const result = await response.json();
                 if (result.status === 'success') {
-                    alert(`Venta #${result.venta_id} guardada con éxito.`);
-                    nuevaVenta();
+                    alert(`✅ Venta #${result.venta_id} guardada con éxito.`);
+
+                    // 🧾 Redirigir automáticamente al PDF térmico
+                    if (result.pdf_url) {
+                        window.location.href = result.pdf_url; // abre el PDF
+                    } else {
+                        alert('La venta fue guardada, pero no se generó la URL del PDF.');
+                    }
+
+                    nuevaVenta(); // limpia los campos después
                 } else {
-                    alert(`Error al guardar la venta: ${result.message}`);
+                    alert(`❌ Error al guardar la venta: ${result.message}`);
                 }
             } catch (error) {
                 console.error(error);
-                alert('Ocurrió un error de red al intentar guardar la venta.');
+                alert('⚠️ Ocurrió un error de red al intentar guardar la venta.');
             }
         });
     });

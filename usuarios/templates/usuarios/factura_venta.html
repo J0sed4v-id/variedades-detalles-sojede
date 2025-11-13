@@ -59,8 +59,8 @@
     <p class="center">NIT: 67011859 - 0</p>
     <p>Factura Nro: {{ venta.id }}</p>
     <p>Fecha: {{ venta.fecha|date:"d/m/Y" }} &nbsp;&nbsp; Hora: {{ venta.fecha|date:"H:i:s" }}</p>
-    <p>Cajero: {{ venta.cajero }} &nbsp;&nbsp;&nbsp; Caja: {{ venta.caja }}</p>
-    <p>Vendedor: {{ venta.vendedor }}</p>
+    <p>Cajero: {{ venta.cajero|default_if_none:"" }} &nbsp;&nbsp;&nbsp; Caja: {{ venta.caja|default_if_none:"" }}</p>
+    <p>Vendedor: {{ venta.vendedor|default_if_none:"" }}</p>
     <hr>
 
     <table>
@@ -77,11 +77,11 @@
             <tr>
                 <td>{{ item.producto.nombre }}</td>
                 <td>{{ item.cantidad }}</td>
-                <td class="right">${{ item.precio_unitario }}</td>
-                <td class="right">${{ item.subtotal }}</td>
+                <td class="right">${{ item.precio_unitario|floatformat:2 }}</td>
+                <td class="right">${{ item.subtotal|floatformat:2 }}</td>
             </tr>
             <tr>
-                <td colspan="4">Cod corto: {{ item.producto.codigo_corto }}</td>
+                <td colspan="4">Cod: {{ item.producto.codigo }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -91,18 +91,18 @@
     <table>
         <tr>
             <td>Total</td>
-            <td class="right">${{ venta.subtotal }}</td>
+            <td class="right">${{ venta.subtotal|floatformat:2 }}</td>
         </tr>
         <tr>
             <td>Descuentos</td>
-            <td class="right">$0,00</td>
+            <td class="right">$0.00</td>
         </tr>
         <tr>
             <td>Vlr IVA</td>
-            <td class="right">${{ venta.iva }}</td>
+            <td class="right">${{ venta.iva|floatformat:2 }}</td>
         </tr>
     </table>
-    <p class="right"><strong>Neto a Pagar: ${{ venta.total }}</strong></p>
+    <p class="right"><strong>Neto a Pagar: ${{ venta.total|floatformat:2 }}</strong></p>
     <hr>
 
     <div class="footer">

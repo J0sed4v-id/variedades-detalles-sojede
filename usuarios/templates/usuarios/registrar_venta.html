@@ -83,6 +83,37 @@
                     </tbody>
                 </table>
             </div>
+            <div class="card" style="margin-top: 20px;">
+                <h3>Historial de Ventas</h3>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table class="sale-details-table">
+                        <thead>
+                            <tr>
+                                <th>ID Venta</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for venta in ventas %}
+                            <tr>
+                                <td>{{ venta.id }}</td>
+                                <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+                                <td>$ {{ venta.total|floatformat:2 }}</td>
+                                <td>
+                                    <a href="{% url 'generar_factura_pdf' venta.id %}" target="_blank" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Ver PDF</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align: center;">No hay ventas registradas.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- Panel Derecho: Totales y Acciones -->
@@ -377,14 +408,15 @@
                 if (result.status === 'success') {
                     alert(`✅ Venta #${result.venta_id} guardada con éxito.`);
 
-                    // 🧾 Redirigir automáticamente al PDF térmico
+                    // 🧾 Abrir PDF en una nueva pestaña y recargar la página
                     if (result.pdf_url) {
-                        window.location.href = result.pdf_url; // abre el PDF
+                        window.open(result.pdf_url, '_blank');
+                        location.reload(); // Recarga para mostrar la venta en el historial
                     } else {
                         alert('La venta fue guardada, pero no se generó la URL del PDF.');
+                        location.reload(); // Recarga de todas formas
                     }
 
-                    nuevaVenta(); // limpia los campos después
                 } else {
                     alert(`❌ Error al guardar la venta: ${result.message}`);
                 }

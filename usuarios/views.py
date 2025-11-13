@@ -3,7 +3,7 @@ import json
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
@@ -576,7 +576,8 @@ def gestionar_inventario(request):
 
 @login_required
 def registrar_venta(request):
-    return render(request, 'usuarios/registrar_venta.html')
+    ventas = Venta.objects.order_by('-fecha')
+    return render(request, 'usuarios/registrar_venta.html', {'ventas': ventas})
 
 @login_required
 def buscar_producto_por_codigo(request):
@@ -608,7 +609,10 @@ def guardar_venta(request):
             venta = Venta.objects.create(
                 subtotal=totales.get('subtotal'),
                 iva=totales.get('iva'),
-                total=totales.get('total')
+                total=totales.get('total'),
+                cajero=request.user.username,
+                vendedor=request.user.username,
+                caja='1'  # Valor por defecto
             )
 
             # Crear los detalles y actualizar stock
@@ -628,15 +632,14 @@ def guardar_venta(request):
                 producto.stock -= cantidad
                 producto.save()
 
-            # ✅ Nueva línea: generar la URL del PDF
-            from django.urls import reverse_lazy
-            pdf_url = reverse_lazy('generar_factura_pdf', args=[venta.id])
+            # Generar la URL del PDF para la respuesta
+            pdf_url = reverse('generar_factura_pdf', args=[venta.id])
 
-            # ✅ Respuesta con URL del PDF incluida
+            # Respuesta con URL del PDF incluida
             return JsonResponse({
                 'status': 'success',
                 'venta_id': venta.id,
-                'pdf_url': str(pdf_url)
+                'pdf_url': pdf_url
             })
 
         except Exception as e:

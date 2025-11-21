@@ -16,12 +16,11 @@ from django.db import IntegrityError
 from django.db.models import Sum, Q  # Importación necesaria para consultas complejas
 from django.template.loader import get_template
 
-from .forms import CustomUserCreationForm, BuscarHabitacionForm, HabitacionForm, ReservaForm
-from .models import Habitacion, Reserva, Cliente, Factura, Compra, Producto, Venta, DetalleVenta
+from .forms import CustomUserCreationForm, ReservaForm
+from .models import Reserva, Cliente, Factura, Compra, Producto, Venta, DetalleVenta
 
 from xhtml2pdf import pisa
 import io
-
 
 
 # Vista para el dashboard (requiere que el usuario esté autenticado)
@@ -68,88 +67,22 @@ def cerrar_sesion(request):
     return redirect('inicio')
 
 
-#/////////////////////////////////////////////////////////////////////////////////////////////////
-# Vista para buscar habitaciones disponibles
-def buscar_habitaciones(request):
-    form = BuscarHabitacionForm(request.POST or None)
-    habitaciones_disponibles = None
-
-    if request.method == 'POST' and form.is_valid():
-        check_in = form.cleaned_data['check_in']
-        check_out = form.cleaned_data['check_out']
-       
-
-        if check_in < timezone.now().date():
-            form.add_error('check_in', "La fecha de entrada no puede ser en el pasado.")
-        elif check_out <= check_in:
-            form.add_error('check_out', "La fecha de salida debe ser posterior a la de entrada.")
-        else:
-            habitaciones_disponibles = Habitacion.objects.filter(
-                disponible=True,
-            )
-
-    return render(request, 'usuarios/buscar_habitaciones.html', {
-        'form': form,
-        'habitaciones_disponibles': habitaciones_disponibles
-    })
-#/////////////////////////////////////////////////////////////////////////////////////////////////
-# Vista para crear una nueva habitación
-@login_required
-def crear_habitacion(request):
-    if request.method == 'POST':
-        form = HabitacionForm(request.POST)
-        if form.is_valid():
-            habitacion = form.save(commit=False)
-            habitacion.usuario = request.user  # Asignar el usuario autenticado
-            habitacion.save()
-            messages.success(request, "Habitación creada con éxito.")
-            return redirect('visualizar_habitaciones')
-    else:
-        form = HabitacionForm()
-    return render(request, 'usuarios/crear_habitacion.html', {'form': form})
-#/////////////////////////////////////////////////////////////////////////////////////////////////
-# Vista para actualizar los detalles de una habitación
-@login_required
-def actualizar_habitacion(request, id):
-    habitacion = get_object_or_404(Habitacion, id=id)  # Eliminamos la restricción de usuario
-    if request.method == 'POST':
-        form = HabitacionForm(request.POST, instance=habitacion)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Habitación actualizada con éxito.")
-            return redirect('visualizar_habitaciones')
-    else:
-        form = HabitacionForm(instance=habitacion)
-    return render(request, 'usuarios/actualizar_habitacion.html', {'form': form})
-
-#/////////////////////////////////////////////////////////////////////////////////////////////////
-# Vista para eliminar una habitación
-def eliminar_habitacion(request, id):
-    habitacion = get_object_or_404(Habitacion, id=id)
-
-    # Eliminar la habitación
-    habitacion.delete()
-    return redirect('visualizar_habitaciones')
-
-
-
 #/////////////////////////////////////////////////////////////////////////////////////
 
 # Vista para visualizar todas las habitaciones
 @login_required
 def gestionar_productos(request):
-    # gestión principal de "productos" reutilizando el modelo Habitacion
-    habitaciones = Habitacion.objects.all()
-    form = HabitacionForm()
+    productos = Producto.objects.all()
+    form = ProductoForm()
 
     if request.method == 'POST':
-        form = HabitacionForm(request.POST)
+        form = ProductoForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('productos')
 
     return render(request, 'usuarios/productos.html', {
-        'habitaciones': habitaciones,
+        'productos': productos,
         'form': form
     })
 
@@ -344,92 +277,6 @@ def generar_factura_pdf(request, venta_id):
         return HttpResponse('Error al generar el PDF', status=500)
     return response
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@login_required
-def gestionar_reservas(request):
-    usuario = request.user
-    cliente, _ = Cliente.objects.get_or_create(usuario=usuario)
-    reservas = Reserva.objects.filter(cliente=cliente, estado_reserva='reservada')
-    habitaciones_disponibles = Habitacion.objects.filter(disponible=True)
-
-    # --------------------- RESERVAR ---------------------
-    if request.method == 'POST' and 'reservar' in request.POST:
-        form = ReservaForm(request.POST)
-        form.fields['habitacion'].queryset = habitaciones_disponibles  # Filtrar habitaciones disponibles
-        if form.is_valid():
-            reserva = form.save(commit=False)
-            habitacion = reserva.habitacion
-            if habitacion.disponible:
-                habitacion.disponible = False
-                habitacion.save()
-                reserva.cliente = cliente
-                reserva.estado_reserva = 'reservada'
-                reserva.save()
-                messages.success(request, f'¡Reserva realizada con éxito para la habitación {habitacion.numero}!')
-                return redirect('gestionar_reservas')
-            else:
-                messages.error(request, 'La habitación seleccionada no está disponible.')
-        else:
-            messages.error(request, 'Hay errores en el formulario. Por favor verifica los datos.')
-
-    # --------------------- CANCELAR ---------------------
-    elif request.method == 'POST' and 'cancelar' in request.POST:
-        reserva_id = request.POST.get('reserva_id')
-        reserva = get_object_or_404(Reserva, id=reserva_id, cliente=cliente, estado_reserva='reservada')
-        reserva.estado_reserva = 'cancelada'
-        reserva.habitacion.disponible = True
-        reserva.habitacion.save()
-        reserva.save()
-        messages.success(request, f'Reserva para habitación {reserva.habitacion.numero} cancelada con éxito.')
-        return redirect('gestionar_reservas')
-
-    # ---------------------- MODIFICAR ------------------------
-    elif request.method == 'POST' and 'modificar' in request.POST:
-        reserva_id = request.POST.get('reserva_id_modificar')
-        nueva_inicio = request.POST.get('nueva_fecha_inicio')
-        nueva_fin = request.POST.get('nueva_fecha_fin')
-
-        try:
-            reserva = Reserva.objects.get(id=reserva_id, cliente=cliente, estado_reserva='reservada')
-            reserva.fecha_inicio = nueva_inicio
-            reserva.fecha_fin = nueva_fin
-            reserva.save()
-            messages.success(request, f'Reserva {reserva.id} modificada con éxito.')
-        except Reserva.DoesNotExist:
-            messages.error(request, 'Reserva no encontrada para modificar.')
-        return redirect('gestionar_reservas')
-
-    else:
-        form = ReservaForm()
-
-    context = {
-        'form': form,
-        'reservas': reservas,
-        'habitaciones_disponibles': habitaciones_disponibles,
-        'hoy': date.today()
-    }
-    return render(request, 'usuarios/gestionar_reservas.html', context)
 
 # _ _ _ _ _
 

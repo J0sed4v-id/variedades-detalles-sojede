@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.db import IntegrityError
-from django.db.models import Sum
+from django.db.models import Sum, Q  # Importación necesaria para consultas complejas
 from django.template.loader import get_template
 
 from .forms import CustomUserCreationForm, BuscarHabitacionForm, HabitacionForm, ReservaForm

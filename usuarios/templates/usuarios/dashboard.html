@@ -18,7 +18,7 @@
                 <a href="{% url 'productos' %}">Productos</a>
                 <a href="{% url 'inventario' %}">Inventario</a>
                 <a href="{% url 'compras' %}">Compras</a>
-                <a href="{% url 'facturas_placeholder' %}">Facturas</a>
+                <a href="{% url 'reportes' %}">Reportes</a>
             </nav>
         </div>
         <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
@@ -53,12 +53,12 @@
                 <a href="{% url 'compras' %}" class="btn-sojede">Ir a registrar venta</a>
             </div>
 
-            <!-- Facturas -->
+            <!-- Reportes -->
             <div class="dashboard-card">
-                <img src="{% static 'images/factura.png' %}" alt="Facturas">
-                <h3>Facturas</h3>
+                <img src="{% static 'images/factura.png' %}" alt="Reportes">
+                <h3>Reportes</h3>
                 <p>................<br>próximamente................</p>
-                <a href="#" class="btn-sojede disabled">Ir a tus facturas</a>
+                <a href="#" class="btn-sojede disabled">Ir a tus Reportes</a>
             </div>
         </div>
     </main>

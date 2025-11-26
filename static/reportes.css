@@ -1,0 +1,186 @@
+/* ===== BASE ===== */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background: #fff;
+    color: #000;
+}
+
+/* ===== HEADER ===== */
+.header-sojede {
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 60px;
+    border-bottom: 4px solid #d4af37;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 45px;
+}
+
+.header-left img {
+    height: 90px;
+}
+
+.nav-sojede a {
+    color: #d4af37;
+    font-size: 18px;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 18px;
+    transition: 0.3s;
+}
+
+.nav-sojede a.active,
+.nav-sojede a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+}
+
+.btn-logout-sojede {
+    background: #fff;
+    color: #000;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.btn-logout-sojede:hover {
+    background: #d4af37;
+    color: #fff;
+}
+
+/* ===== MAIN ===== */
+.main-sojede {
+    flex: 1;
+    padding: 60px 90px;
+}
+
+.section-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 35px;
+}
+
+/* Cuadro de totales */
+.report-box {
+    border: 2px solid #000;
+    padding: 22px;
+    border-radius: 12px;
+    background: #fafafa;
+    margin-bottom: 45px;
+    max-width: 410px;
+}
+
+/* ===== TABLA ===== */
+.products-table {
+    width: 70%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.products-table th {
+    background: #d4af37;
+    color: #000;
+    padding: 10px;
+    text-align: left;
+    font-weight: 700;
+    border: 1px solid #000;   /* 🔥 borde negro alrededor */
+}
+
+.products-table td {
+    border: 1px solid #000;
+    padding: 10px;
+}
+
+.products-table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+/* ===== BOTONES EXPORTAR ===== */
+.report-actions {
+    margin-top: 40px;
+}
+
+.btn-report {
+    display: inline-block;
+    padding: 10px 22px;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    margin-right: 20px;
+}
+
+.btn-report.pdf {
+    background: #c40000;
+    color: white;
+}
+.btn-report.excel {
+    background: #0a8a24;
+    color: white;
+}
+
+.btn-report:hover {
+    opacity: 0.85;
+}
+
+/* ===== FOOTER ===== */
+.footer-sojede {
+    background: #000;
+    color: #d4af37;
+    text-align: center;
+    padding: 14px;
+    border-top: 4px solid #d4af37;
+}
+
+.stock-table {
+    width: 17%; /* puedes ajustar 50%, 45%, 60%, etc */
+    margin: 0 auto; /* la mantiene centrada */
+    margin-left: 0;
+}
+
+
+.report-box-side-by-side {
+    display: flex;
+    justify-content: space-between; /* separa tabla y gráfico */
+    align-items: flex-start; /* alinearlos por arriba */
+    gap: 20px; /* espacio entre tabla y gráfico */
+    margin-top: auto;
+}
+
+.tabla-stock-bajo {
+    flex: 1; /* ocupa proporcionalmente más espacio */
+}
+
+.grafico-mas-vendidos {
+    width: 800px; /* ancho fijo para el gráfico */
+    margin-left: 900px;
+    margin-top: -430px;
+   
+}
+
+.btn-report.pdf {
+    background-color: #D4AF37; /* dorado */
+    color: #fff;               /* texto blanco */
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    
+}
+
+.btn-report.pdf:hover {
+    background-color: #b9932b; /* dorado más oscuro al pasar el cursor */
+}

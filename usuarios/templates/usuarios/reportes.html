@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes</title>
+    <link rel="stylesheet" href="{% static 'reportes.css' %}">
+</head>
+<body>
+
+<header class="header-sojede">
+    <div class="header-left">
+        <img src="{% static 'images/logo.jpg' %}" alt="logo">
+        <nav class="nav-sojede">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'reportes' %}" class="active">Reportes</a>
+        </nav>
+    </div>
+    <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
+</header>
+
+<main class="main-sojede">
+    <h1 class="section-title">📊 Reportes Generales</h1>
+
+    <div class="report-box">
+        <p><strong>Cantidad total de productos vendidos :</strong> {{ total_ventas }}</p>
+        <p><strong>Total ventas del periodo:</strong> ${{ total_facturado }}</p>
+
+        {% if producto_mas_vendido %}
+        <p><strong>Producto más vendido:</strong>
+            {{ producto_mas_vendido.producto__nombre }} ({{ producto_mas_vendido.total_vendido }} unidades)
+        </p>
+        {% endif %}
+
+        {% if producto_menos_vendido %}
+        <p><strong>Producto menos vendido:</strong>
+            {{ producto_menos_vendido.producto__nombre }} ({{ producto_menos_vendido.total_vendido }} unidades)
+        </p>
+        {% endif %}
+    </div>
+
+
+   <div class="report-box-side-by-side">
+    <!-- Tabla de stock bajo -->
+    <div class="tabla-stock-bajo">
+
+    <h2 class="section-title">📉 Productos con stock bajo</h2>
+    <table class="products-table stock-table">
+        <thead>
+            <tr>
+                <th>Producto:</th>
+                <th>Cantidad:</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in stock_bajo %}
+            <tr>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.stock }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No hay productos con stock bajo.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+     </div>
+   </div>
+
+  <!-- Gráfico de productos más vendidos -->
+    <div class="grafico-mas-vendidos">
+        <h2 class="section-title">📊 Productos más vendidos</h2>
+        <canvas id="productosMasVendidosChart" width="400" height="200"></canvas>
+    </div>
+</div>
+
+
+    <h2 class="section-title">📦 Historial de ventas</h2>
+
+    <!-- 📌 FILTRO MES / AÑO -->
+   <form method="GET" class="filtro-fecha">
+    <label>Mes:</label>
+    <select name="mes" required>
+        <option value="">Seleccionar</option>
+        {% for m in meses %}
+        <option value="{{ m }}" {% if mes == m|stringformat:"s" %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Año:</label>
+    <select name="anio" required>
+        <option value="">Seleccionar</option>
+        {% for y in anios %}
+        <option value="{{ y }}" {% if anio == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Filtrar</button>
+
+    {% if mes and anio %}
+    <a href="{% url 'reportes' %}" class="btn-limpiar">Quitar filtro</a>
+    {% endif %}
+</form>
+
+    <!-- FIN FILTRO -->
+
+
+    <table class="products-table ">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio unidad</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in ventas %}
+            <tr>
+               <td>{{ v.venta.fecha|date:"d/m/Y" }}</td>
+            <td>{{ v.producto.nombre }}</td>
+            <td>{{ v.cantidad }}</td>
+            <td>${{ v.precio_unitario }}</td>
+            <td>${{ v.subtotal }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No hay ventas en este periodo.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- <h2 class="section-title">📊 Productos más vendidos</h2> -->
+<div class="contenedor-grafico">
+    <div class="grafico-productos-mas-vendidos">
+        
+        <!-- <canvas id="productosMasVendidosChart"></canvas> -->
+    </div>
+</div>
+
+
+    <div class="report-actions">
+        <a href="{% url 'reporte_pdf' %}" class="btn-report pdf">📄 Generar Reporte PDF</a>
+        <!-- <a href="{% url 'reporte_excel' %}" class="btn-report excel">📊 Exportar Excel</a> -->
+    </div>
+</main>
+
+<footer class="footer-sojede">
+    <p>© 2025 — Sistema de Gestión de Inventario y Facturación.</p>
+    <p>soporte.sojede@gmail.com</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('productosMasVendidosChart').getContext('2d');
+
+const productos = {{ productos_chart|safe }};
+const cantidades = {{ cantidades_chart|safe }};
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: productos,
+        datasets: [{
+            label: 'Cantidad vendida',
+            data: cantidades,
+            backgroundColor: 'rgba(212, 175, 55, 0.7)',
+            borderColor: 'rgba(212, 175, 55, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                precision:0
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>

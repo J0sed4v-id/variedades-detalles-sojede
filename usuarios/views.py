@@ -15,12 +15,16 @@ from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.db.models import Sum, Q  # Importación necesaria para consultas complejas
 from django.template.loader import get_template
-
 from .forms import CustomUserCreationForm, ReservaForm
 from .models import Reserva, Cliente, Factura, Compra, Producto, Venta, DetalleVenta
-
 from xhtml2pdf import pisa
 import io
+from io import BytesIO
+from datetime import datetime
+from django.db.models import Sum, F
+
+
+
 
 
 # Vista para el dashboard (requiere que el usuario esté autenticado)
@@ -527,3 +531,163 @@ def buscar_productos(request):
     )
     data = [{"id": p.id, "text": f"{p.nombre} — Stock: {p.stock}"} for p in resultados]
     return JsonResponse({"results": data})
+
+#/////////////////////////////////////////////////////////////////////////////////////////////
+@login_required
+def reportes(request):
+    ventas = Venta.objects.all()
+    productos = Producto.objects.all()
+    facturas = Factura.objects.all()
+
+    total_ventas = ventas.count()
+    total_facturado = sum(f.total for f in facturas)
+    stock_bajo = productos.filter(stock__lte=5)
+
+    # Producto más vendido y menos vendido
+    producto_mas_vendido = DetalleVenta.objects.values('producto__nombre') \
+        .annotate(total_vendido=Sum('cantidad')) \
+        .order_by('-total_vendido') \
+        .first()
+
+    producto_menos_vendido = DetalleVenta.objects.values('producto__nombre') \
+        .annotate(total_vendido=Sum('cantidad')) \
+        .order_by('total_vendido') \
+        .first()
+
+    # Filtro de mes y año
+    mes = request.GET.get('mes')
+    anio = request.GET.get('anio')
+
+    ventas_filtradas = DetalleVenta.objects.all()
+
+    if mes and anio:  # Solo filtra si hay valores
+        try:
+            mes = int(mes)
+            anio = int(anio)
+            inicio = datetime(anio, mes, 1)
+            # Calcula último día del mes
+            if mes == 12:
+                fin = datetime(anio + 1, 1, 1)
+            else:
+                fin = datetime(anio, mes + 1, 1)
+            ventas_filtradas = ventas_filtradas.filter(venta__fecha__gte=inicio, venta__fecha__lt=fin)
+        except ValueError:
+            # En caso de que mes o año no sean números válidos, ignorar filtro
+            pass
+
+# Preparar datos para la tabla
+    productos_vendidos = ventas_filtradas.annotate(
+        fecha_venta=F('venta__fecha'),
+        nombre_producto=F('producto__nombre'),
+        precio_unitario_producto=F('precio_unitario'),
+        cantidad_vendida=F('cantidad'),
+        total_producto=F('subtotal')
+    ).order_by('-venta__fecha')
+
+    # Datos para el gráfico de productos más vendidos
+    ranking = ventas_filtradas.values('producto__nombre').annotate(
+        total_vendido=Sum('cantidad')
+    ).order_by('-total_vendido')
+    productos_chart = [r['producto__nombre'] for r in ranking]
+    cantidades_chart = [r['total_vendido'] for r in ranking]
+
+    # Rangos para filtros
+    meses = range(1, 13)
+    anios = range(2023, datetime.now().year + 1)
+
+
+    context = {
+        'ventas': ventas_filtradas,
+        'productos': productos,
+        'facturas': facturas,
+        'total_ventas': total_ventas,
+        'total_facturado': total_facturado,
+        'stock_bajo': stock_bajo,
+        'producto_mas_vendido': producto_mas_vendido,
+        'producto_menos_vendido': producto_menos_vendido,
+        'meses': range(1, 13),
+        'anios': range(2023, datetime.now().year + 1),
+        'mes': request.GET.get('mes'),
+        'anio': request.GET.get('anio'),
+        'productos_chart': productos_chart,
+        'cantidades_chart': cantidades_chart,
+    }
+
+    return render(request, 'usuarios/reportes.html', context)
+
+#//////////////////////////////////////////////////////////////////////////
+@login_required
+def reportes_view(request):
+    from datetime import datetime
+    año_actual = datetime.now().year
+    años = list(range(año_actual, año_actual - 6, -1))  # Últimos 6 años
+
+    mes = request.GET.get('mes')
+    anio = request.GET.get('anio')
+
+    ventas = FacturaDetalle.objects.select_related('producto', 'factura')
+
+    # ☑ Aplicar filtro si se selecciona mes y año
+    if mes and anio:
+        ventas = ventas.filter(
+            factura__fecha__month=mes,
+            factura__fecha__year=anio
+        )
+
+    # Tabla con datos completos
+    productos_vendidos = ventas.annotate(
+        fecha=F('factura__fecha'),
+        nombre=F('producto__nombre'),
+        precio_unitario=F('precio_unitario'),
+        cantidad=F('cantidad'),
+        total=F('subtotal')
+    ).order_by('-factura__fecha')
+
+    # Totales generales
+    total_facturado = ventas.aggregate(total=Sum('subtotal'))['total'] or 0
+    total_ventas = ventas.aggregate(total=Sum('cantidad'))['total'] or 0
+
+    # Producto más y menos vendido
+    ranking = ventas.values('producto__nombre').annotate(
+        total_vendido=Sum('cantidad')
+    ).order_by('-total_vendido')
+
+    producto_mas_vendido = ranking.first() if ranking else None
+    producto_menos_vendido = ranking.last() if ranking else None
+
+    context = {
+        'productos_vendidos': productos_vendidos,
+        'años': años,
+        'total_facturado': total_facturado,
+        'total_ventas': total_ventas,
+        'producto_mas_vendido': producto_mas_vendido,
+        'producto_menos_vendido': producto_menos_vendido,
+    }
+
+    return render(request, 'reportes/reportes.html', context)
+
+#////////////////////////////////////////////////////////////////////////
+
+
+def reporte_pdf(request):
+    template = get_template('usuarios/reportes_pdf.html')
+    context = {
+        'ventas': Venta.objects.all(),
+        'productos': Producto.objects.all(),
+        'facturas': Factura.objects.all(),
+    }
+    html = template.render(context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
+    pisa.CreatePDF(html, dest=response)
+    return response
+
+
+@login_required
+def reporte_excel(request):
+    ventas = Venta.objects.all().values()
+    df = pd.DataFrame(ventas)
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="reporte.xlsx"'
+    df.to_excel(response, index=False)
+    return response

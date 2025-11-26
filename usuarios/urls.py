@@ -37,4 +37,11 @@ urlpatterns = [
 
     # ✅ Nueva ruta para generar la factura PDF térmica
     path('factura/<int:venta_id>/pdf/', views.generar_factura_pdf, name='generar_factura_pdf'),
+
+# ✅ Nuevas rutas para generar reportes en diferentes formatos
+    path('reportes/', views.reportes, name='reportes'),
+    path('reportes/pdf/', views.reporte_pdf, name='reporte_pdf'),
+    path('reportes/excel/', views.reporte_excel, name='reporte_excel'),
+
+
 ]

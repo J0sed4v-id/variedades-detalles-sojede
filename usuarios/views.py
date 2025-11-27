@@ -543,19 +543,77 @@ def reportes(request):
     total_facturado = sum(f.total for f in facturas)
     stock_bajo = productos.filter(stock__lte=5)
 
+    # Producto más vendido y menos vendido
+    producto_mas_vendido = DetalleVenta.objects.values('producto__nombre') \
+        .annotate(total_vendido=Sum('cantidad')) \
+        .order_by('-total_vendido') \
+        .first()
+
+    producto_menos_vendido = DetalleVenta.objects.values('producto__nombre') \
+        .annotate(total_vendido=Sum('cantidad')) \
+        .order_by('total_vendido') \
+        .first()
+
+    # Filtro de mes y año
+    mes = request.GET.get('mes')
+    anio = request.GET.get('anio')
+
+    ventas_filtradas = DetalleVenta.objects.all()
+
+    if mes and anio:  # Solo filtra si hay valores
+        try:
+            mes = int(mes)
+            anio = int(anio)
+            inicio = datetime(anio, mes, 1)
+            # Calcula último día del mes
+            if mes == 12:
+                fin = datetime(anio + 1, 1, 1)
+            else:
+                fin = datetime(anio, mes + 1, 1)
+            ventas_filtradas = ventas_filtradas.filter(venta__fecha__gte=inicio, venta__fecha__lt=fin)
+        except ValueError:
+            # En caso de que mes o año no sean números válidos, ignorar filtro
+            pass
+
+# Preparar datos para la tabla
+    productos_vendidos = ventas_filtradas.annotate(
+        fecha_venta=F('venta__fecha'),
+        nombre_producto=F('producto__nombre'),
+        precio_unitario_producto=F('precio_unitario'),
+        cantidad_vendida=F('cantidad'),
+        total_producto=F('subtotal')
+    ).order_by('-venta__fecha')
+
+    # Datos para el gráfico de productos más vendidos
+    ranking = ventas_filtradas.values('producto__nombre').annotate(
+        total_vendido=Sum('cantidad')
+    ).order_by('-total_vendido')
+    productos_chart = [r['producto__nombre'] for r in ranking]
+    cantidades_chart = [r['total_vendido'] for r in ranking]
+
+    # Rangos para filtros
+    meses = range(1, 13)
+    anios = range(2023, datetime.now().year + 1)
+
+
     context = {
-        'ventas': ventas,
+        'ventas': ventas_filtradas,
         'productos': productos,
         'facturas': facturas,
         'total_ventas': total_ventas,
         'total_facturado': total_facturado,
         'stock_bajo': stock_bajo,
+        'producto_mas_vendido': producto_mas_vendido,
+        'producto_menos_vendido': producto_menos_vendido,
+        'meses': range(1, 13),
+        'anios': range(2023, datetime.now().year + 1),
+        'mes': request.GET.get('mes'),
+        'anio': request.GET.get('anio'),
+        'productos_chart': productos_chart,
+        'cantidades_chart': cantidades_chart,
     }
 
     return render(request, 'usuarios/reportes.html', context)
-
-#//////////////////////////////////////////////////////////////////////////
-@login_required
 def reportes_view(request):
     from datetime import datetime
     año_actual = datetime.now().year
@@ -609,19 +667,36 @@ def reportes_view(request):
 
 
 def reporte_pdf(request):
-    template = get_template('usuarios/reportes_pdf.html')
+    ventas = Venta.objects.all()
+    total_ventas = ventas.aggregate(Sum('total'))['total__sum'] or 0
+
+    productos = Producto.objects.annotate(
+        total_vendido=Sum('detalleventa__cantidad')
+    ).order_by('-total_vendido')
+
+    producto_mas_vendido = productos.first()
+
+    template_path = 'usuarios/reportes_pdf.html'
     context = {
-        'ventas': Venta.objects.all(),
-        'productos': Producto.objects.all(),
-        'facturas': Factura.objects.all(),
+        'ventas': ventas,
+        'total_ventas': total_ventas,
+        'productos': productos,
+        'producto_mas_vendido': producto_mas_vendido,
     }
+
+    template = get_template(template_path)
     html = template.render(context)
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
-    pisa.CreatePDF(html, dest=response)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse("Error al generar el PDF 🛑")
     return response
 
-
+#/////////////////////////////////////////////////////////////////////////
 @login_required
 def reporte_excel(request):
     ventas = Venta.objects.all().values()
@@ -631,7 +706,7 @@ def reporte_excel(request):
     df.to_excel(response, index=False)
     return response
 
-
+#/////////////////////////////////////////////////////////////////////////
 # Vista principal para gestionar proveedores
 @login_required
 def proveedores(request):

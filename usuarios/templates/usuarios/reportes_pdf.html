@@ -1,11 +1,64 @@
-<h2>Reporte de ventas e inventario</h2>
-<table border="1" cellspacing="0" cellpadding="4">
-<tr><th>Producto</th><th>Cantidad</th><th>Precio</th></tr>
-{% for p in productos %}
-<tr>
-  <td>{{ p.nombre }}</td>
-  <td>{{ p.cantidad }}</td>
-  <td>${{ p.precio }}</td>
-</tr>
-{% endfor %}
-</table>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte PDF</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        h1 { text-align: center; color: #333; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #111;
+            padding: 6px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .section-title {
+            margin-top: 25px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Reporte General de Productos</h1>
+
+    <p class="section-title">📌 Producto más vendido</p>
+    {% if producto_mas_vendido %}
+        <p><strong>Nombre:</strong> {{ producto_mas_vendido.nombre }}</p>
+        <p><strong>Total vendido:</strong> {{ producto_mas_vendido.total_vendido }}</p>
+    {% else %}
+        <p>No existen ventas registradas.</p>
+    {% endif %}
+
+    <p class="section-title">📌 Productos registrados</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Total vendido</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for producto in productos %}
+            <tr>
+                <td>{{ producto.nombre }}</td>
+                <td>${{ producto.precio }}</td>
+                <td>{{ producto.stock }}</td>
+                <td>{{ producto.total_vendido }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

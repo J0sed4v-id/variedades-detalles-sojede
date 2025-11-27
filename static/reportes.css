@@ -64,6 +64,7 @@ body {
 .main-sojede {
     flex: 1;
     padding: 60px 90px;
+    position: relative; /* necesario para posicionar acciones al lado del recuadro */
 }
 
 .section-title {
@@ -80,6 +81,44 @@ body {
     background: #fafafa;
     margin-bottom: 45px;
     max-width: 410px;
+}
+
+/* Posiciona las acciones (botones) al lado derecho del recuadro de totales y más abajo */
+.main-sojede .report-actions {
+    position: absolute; /* ahora aplica independientemente del orden en el DOM */
+    top: 790px;          /* bajado muy poquito (antes 780px) */
+    left: calc(410px + 40px); /* movido más a la izquierda (ajusta este valor si quieres más/menos) */
+    z-index: 2000;       /* prioridad para evitar solapamientos */
+    margin-top: 0;       /* reset si había margen */
+}
+
+/* Asegurar que los botones dentro se alineen sin margen superior extra */
+.main-sojede .report-actions .btn-report {
+    margin-top: 0;
+}
+
+/* Ajuste responsive: en pantallas pequeñas no lo sube tanto para evitar solapamientos */
+@media (max-width: 600px) {
+    .btn-report.pdf {
+        transform: translateY(-3px); /* ajuste más sutil en móvil */
+    }
+    .btn-report.pdf:hover {
+        transform: translateY(-5px);
+    }
+}
+
+/* Mobile & small screens: volver al flujo normal para no solapar contenido */
+@media (max-width: 900px) {
+    .main-sojede .report-actions {
+        position: static;
+        left: auto;
+        top: auto;
+        margin-top: 16px; /* espacio debajo del recuadro en pantallas pequeñas */
+    }
+    
+    .btn-report.pdf {
+        transform: translateY(-3px); /* mantener un pequeño ajuste si quieres */
+    }
 }
 
 /* ===== TABLA ===== */
@@ -110,6 +149,7 @@ body {
 /* ===== BOTONES EXPORTAR ===== */
 .report-actions {
     margin-top: 40px;
+    position: relative; /* permite mover botones sin afectar otros elementos */
 }
 
 .btn-report {
@@ -122,8 +162,16 @@ body {
 }
 
 .btn-report.pdf {
-    background: #c40000;
-    color: white;
+    background-color: #D4AF37; /* dorado */
+    color: #fff;               /* texto blanco */
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s ease; /* agregada transición para movimiento */
+    transform: translateY(13px); /* pequeño ajuste vertical para alinear con la nueva posición */
+    z-index: 1000;
 }
 .btn-report.excel {
     background: #0a8a24;
@@ -132,6 +180,10 @@ body {
 
 .btn-report:hover {
     opacity: 0.85;
+}
+.btn-report.pdf:hover {
+    background-color: #b9932b; /* dorado más oscuro al pasar el cursor */
+    transform: translateY(-6px); /* efecto de "levantamiento" al pasar el cursor */
 }
 
 /* ===== FOOTER ===== */
@@ -165,22 +217,9 @@ body {
 .grafico-mas-vendidos {
     width: 800px; /* ancho fijo para el gráfico */
     margin-left: 900px;
-    margin-top: -430px;
-   
-}
-
-.btn-report.pdf {
-    background-color: #D4AF37; /* dorado */
-    color: #fff;               /* texto blanco */
-    border: none;
-    border-radius: 5px;
-    padding: 8px 16px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s;
-    
-}
-
-.btn-report.pdf:hover {
-    background-color: #b9932b; /* dorado más oscuro al pasar el cursor */
+    margin-top: -490px; /* aumentado el valor negativo para subir el gráfico un poco */
+    border: 3px solid black;
+    border-radius: 12px;     /* bordes redondeados */
+    overflow: hidden;        /* evita que el contenido se salga de las esquinas redondeadas */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* opcional: sombra ligera */
 }

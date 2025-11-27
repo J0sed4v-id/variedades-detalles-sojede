@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestión de Proveedores{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'proveedores.css' %}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-sojede">
+        <div class="header-left">
+            <img src="{% static 'images/logo.jpg' %}" alt="Logo Sojede">
+            <nav class="nav-sojede">
+                <a href="{% url 'dashboard' %}">Inicio</a>
+                <a href="{% url 'productos' %}">Productos</a>
+                <a href="{% url 'inventario' %}">Inventario</a>
+                <a href="{% url 'compras' %}">Compras</a>
+                <a href="{% url 'reportes' %}">Reportes</a>
+                <a href="{% url 'proveedores' %}" class="active">Proveedores</a>
+            </nav>
+        </div>
+        <a href="{% url 'cerrar_sesion' %}" class="btn-logout-sojede">Cerrar sesión</a>
+    </header>
+
+    <main class="main-container">
+        {% block content %}
+        <!-- Contenido específico de la página -->
+        <!-- FORMULARIO -->
+        <div class="left-panel">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Gestión de proveedores</h2>
+                    <button onclick="limpiarFormulario()" class="btn btn-primary" style="padding: 4px 12px;">+</button>
+                </div>
+
+                <hr>
+
+                <form method="POST" action="{% url 'proveedores' %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="id" name="id">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Nombre:</label>
+                            <input type="text" id="nombre" name="nombre" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Teléfono:</label>
+                            <input type="text" id="telefono" name="telefono">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo:</label>
+                            <input type="email" id="correo" name="correo">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Dirección:</label>
+                            <input type="text" id="direccion" name="direccion">
+                        </div>
+
+                        <div class="form-group">
+                            <label>NIT:</label>
+                            <input type="text" id="nit" name="nit" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+
+        <!-- TABLA -->
+        <div class="right-panel">
+            <div class="card">
+                <h3>Lista de proveedores</h3>
+
+                <!-- Buscador -->
+                <form method="GET">
+                    <input type="text" name="q" value="{{ q }}" id="buscar" placeholder="🔍 Buscar proveedores">
+                </form>
+
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Dirección</th>
+                            <th>NIT</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for p in proveedores %}
+                        <tr>
+                            <td>{{ p.nombre }}</td>
+                            <td>{{ p.telefono }}</td>
+                            <td>{{ p.correo }}</td>
+                            <td>{{ p.direccion }}</td>
+                            <td>{{ p.nit }}</td>
+
+                            <td>
+                                <button
+                                    class="btn btn-edit"
+                                    onclick="editarProveedor('{{ p.id }}','{{ p.nombre }}','{{ p.telefono }}','{{ p.correo }}','{{ p.direccion }}','{{ p.nit }}')">
+                                    Editar
+                                </button>
+
+                                <a href="{% url 'eliminar_proveedor' p.id %}"
+                                    class="btn btn-delete"
+                                    onclick="return confirm('¿Eliminar proveedor?')">
+                                    Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" style="text-align:center;">No hay proveedores</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-sojede">
+        <p>© 2025 — Sistema de Gestión de Inventario y Facturación.</p>
+        <p>soporte.sojede@gmail.com</p>
+    </footer>
+
+
+    <!-- 💡 JS mínimo -->
+    <script>
+    function editarProveedor(id, nombre, telefono, correo, direccion, nit) {
+        document.getElementById('id').value = id;
+        document.getElementById('nombre').value = nombre;
+        document.getElementById('telefono').value = telefono;
+        document.getElementById('correo').value = correo;
+        document.getElementById('direccion').value = direccion;
+        document.getElementById('nit').value = nit;
+    }
+
+    function limpiarFormulario() {
+        document.getElementById('id').value = "";
+        document.querySelectorAll("input").forEach(i => i.value = "");
+    }
+    </script>
+
+</body>
+</html>

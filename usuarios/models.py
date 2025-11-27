@@ -149,3 +149,15 @@ class Factura(models.Model):
     def __str__(self):
         return f"Factura de {self.usuario.username} - Reserva {self.reserva.id}"
 
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
+# Modelo Proveedor
+class Proveedor(models.Model):
+    nombre = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=20)
+    correo = models.EmailField(max_length=100, blank=True, null=True)
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    nit = models.CharField(max_length=20, unique=True)
+
+    def __str__(self):
+        return f"{self.nombre} - {self.nit}"
+

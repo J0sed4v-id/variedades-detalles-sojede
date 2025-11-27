@@ -16,7 +16,7 @@ from django.db import IntegrityError
 from django.db.models import Sum, Q  # Importación necesaria para consultas complejas
 from django.template.loader import get_template
 from .forms import CustomUserCreationForm, ReservaForm
-from .models import Reserva, Cliente, Factura, Compra, Producto, Venta, DetalleVenta
+from .models import Reserva, Cliente, Factura, Compra, Producto, Venta, DetalleVenta, Proveedor
 from xhtml2pdf import pisa
 import io
 from io import BytesIO
@@ -543,74 +543,13 @@ def reportes(request):
     total_facturado = sum(f.total for f in facturas)
     stock_bajo = productos.filter(stock__lte=5)
 
-    # Producto más vendido y menos vendido
-    producto_mas_vendido = DetalleVenta.objects.values('producto__nombre') \
-        .annotate(total_vendido=Sum('cantidad')) \
-        .order_by('-total_vendido') \
-        .first()
-
-    producto_menos_vendido = DetalleVenta.objects.values('producto__nombre') \
-        .annotate(total_vendido=Sum('cantidad')) \
-        .order_by('total_vendido') \
-        .first()
-
-    # Filtro de mes y año
-    mes = request.GET.get('mes')
-    anio = request.GET.get('anio')
-
-    ventas_filtradas = DetalleVenta.objects.all()
-
-    if mes and anio:  # Solo filtra si hay valores
-        try:
-            mes = int(mes)
-            anio = int(anio)
-            inicio = datetime(anio, mes, 1)
-            # Calcula último día del mes
-            if mes == 12:
-                fin = datetime(anio + 1, 1, 1)
-            else:
-                fin = datetime(anio, mes + 1, 1)
-            ventas_filtradas = ventas_filtradas.filter(venta__fecha__gte=inicio, venta__fecha__lt=fin)
-        except ValueError:
-            # En caso de que mes o año no sean números válidos, ignorar filtro
-            pass
-
-# Preparar datos para la tabla
-    productos_vendidos = ventas_filtradas.annotate(
-        fecha_venta=F('venta__fecha'),
-        nombre_producto=F('producto__nombre'),
-        precio_unitario_producto=F('precio_unitario'),
-        cantidad_vendida=F('cantidad'),
-        total_producto=F('subtotal')
-    ).order_by('-venta__fecha')
-
-    # Datos para el gráfico de productos más vendidos
-    ranking = ventas_filtradas.values('producto__nombre').annotate(
-        total_vendido=Sum('cantidad')
-    ).order_by('-total_vendido')
-    productos_chart = [r['producto__nombre'] for r in ranking]
-    cantidades_chart = [r['total_vendido'] for r in ranking]
-
-    # Rangos para filtros
-    meses = range(1, 13)
-    anios = range(2023, datetime.now().year + 1)
-
-
     context = {
-        'ventas': ventas_filtradas,
+        'ventas': ventas,
         'productos': productos,
         'facturas': facturas,
         'total_ventas': total_ventas,
         'total_facturado': total_facturado,
         'stock_bajo': stock_bajo,
-        'producto_mas_vendido': producto_mas_vendido,
-        'producto_menos_vendido': producto_menos_vendido,
-        'meses': range(1, 13),
-        'anios': range(2023, datetime.now().year + 1),
-        'mes': request.GET.get('mes'),
-        'anio': request.GET.get('anio'),
-        'productos_chart': productos_chart,
-        'cantidades_chart': cantidades_chart,
     }
 
     return render(request, 'usuarios/reportes.html', context)
@@ -691,3 +630,54 @@ def reporte_excel(request):
     response['Content-Disposition'] = 'attachment; filename="reporte.xlsx"'
     df.to_excel(response, index=False)
     return response
+
+
+# Vista principal para gestionar proveedores
+@login_required
+def proveedores(request):
+    q = request.GET.get("q", "").strip()
+
+    # Buscar proveedores por nombre
+    proveedores = Proveedor.objects.filter(nombre__icontains=q)
+
+    if request.method == "POST":
+        proveedor_id = request.POST.get("id")
+
+        nombre = request.POST.get("nombre")
+        telefono = request.POST.get("telefono")
+        correo = request.POST.get("correo")
+        direccion = request.POST.get("direccion")
+        nit = request.POST.get("nit")
+
+        # EDITAR proveedor existente
+        if proveedor_id:
+            proveedor = Proveedor.objects.get(id=proveedor_id)
+            proveedor.nombre = nombre
+            proveedor.telefono = telefono
+            proveedor.correo = correo
+            proveedor.direccion = direccion
+            proveedor.nit = nit
+            proveedor.save()
+
+        # CREAR nuevo proveedor
+        else:
+            Proveedor.objects.create(
+                nombre=nombre,
+                telefono=telefono,
+                correo=correo,
+                direccion=direccion,
+                nit=nit,
+            )
+
+        return redirect("proveedores")
+
+    return render(request, "usuarios/proveedores.html", {
+        "proveedores": proveedores,
+        "q": q
+    })
+
+@login_required
+def eliminar_proveedor(request, proveedor_id):
+    proveedor = get_object_or_404(Proveedor, id=proveedor_id)
+    proveedor.delete()
+    return redirect("proveedores")
